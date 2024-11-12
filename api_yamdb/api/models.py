@@ -34,7 +34,7 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
-        related_name='categorys', null=True
+        related_name='categories', null=True
     )
 
     def __str__(self):

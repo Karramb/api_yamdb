@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         # временно оставим id для удобства
         fields = '__all__'
-        # вот так в будущем:
+        # вот так по ТЗ:
         # fields = ('name', 'slug')
 
 
@@ -21,7 +21,7 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         # временно оставим id для удобства
         fields = '__all__'
-        # вот так в будущем:
+        # вот так по ТЗ:
         # fields = ('name', 'slug')
 
 
