@@ -28,10 +28,7 @@ class Title(models.Model):
     # этот тип выбрала т к у него значения от 0 до 32767.
     year = models.PositiveSmallIntegerField()
     description = models.TextField(blank=True, null=True)
-    genre = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL,
-        related_name='titles', null=True
-    )
+    genre = models.ManyToManyField(Genre)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
         related_name='categories', null=True
