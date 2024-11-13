@@ -36,16 +36,15 @@ class Title(models.Model):
     # этот тип выбрала т к у него значения от 0 до 32767.
     year = models.PositiveSmallIntegerField()
     description = models.TextField(blank=True, null=True)
-    # временное не обязательное, надо убрать!!! blank=False, null=True
     genre = models.ManyToManyField(Genre, through='TitleGenre')
-    # необязательное убрать! blank=False,
+    # null=True убрать??
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
-        related_name='categories', null=True, blank=False
+        related_name='categories', null=True
     )
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('id',)
 
     def __str__(self):
         return self.name

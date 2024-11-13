@@ -42,10 +42,18 @@ class GenreViewSet(
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    # serializer_class = TitleSerializer
-    serializer_class = TitleCreateSerializer
+    serializer_class = TitleSerializer
     # надо убрать put, но моему ревьюеру этот метод не нравился
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
+
+    # retrieve получения определённого объекта
+    def get_serializer_class(self):
+        # получения списка объектов или одного чтоб выводило категорию - словарь
+        if self.action == 'list' or self.action == 'retrieve':
+            return TitleSerializer
+        if self.action == 'create':      # create создание объекта = post
+            return TitleCreateSerializer
+        return TitleSerializer

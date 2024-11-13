@@ -25,7 +25,7 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-# так получаю корректный ответ на get запрос (как надо отображает категории):
+# для get запроса
 class TitleSerializer(serializers.ModelSerializer):
     # Чтоб выводило как словарь:
     category = CategorySerializer(many=False)
@@ -35,28 +35,11 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
         fields = '__all__'
 
-    def validate_year(self, value):
-        if value > dt.datetime.now().year:
-            raise serializers.ValidationError(
-                "Год выпуска не может быть больше текущего."
-            )
-        return value
 
-
-# ПО тз post запрос:
-# # {
-# "name": "string",
-# "year": 0,
-# "description": "string",
-# "genre": [
-# "string"
-# ],
-# "category": "string"    Строка!
-# }:
-# и вот так SlugRelatedFiel категорию сохранит
+# для post запроса
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
-    # genre = GenreSerializer(many=True)
+    genre = serializers.ListField(write_only=True)
 
     class Meta:
         model = Title
@@ -68,27 +51,11 @@ class TitleCreateSerializer(serializers.ModelSerializer):
                 "Год выпуска не может быть больше текущего."
             )
         return value
-    
+
     def create(self, validated_data):
-        # удаляем список slug жанров из входных данных пока, чтоб не мешал
         genres = validated_data.pop('genre')
         title = Title.objects.create(**validated_data)
+        for genre in genres:
+            id = Genre.objects.get(slug=genre)
+            TitleGenre.objects.create(title=title, genre=id)
         return title
-# А результат:
-# {
-# "id": 0,
-# "name": "string",
-# "year": 0,
-# "rating": 0,
-# "description": "string",
-# "genre": [
-# {
-# "name": "string",
-# "slug": "^-$"
-# }
-# ],
-# "category": {        
-# "name": "string",     Словарь! а это надо как 31 строке указать.
-# "slug": "^-$"
-# }
-# }
