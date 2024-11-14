@@ -54,3 +54,10 @@ class TitleGenre(models.Model):
 
     def __str__(self):
         return f'{self.title} {self.genre}'
+
+
+class Reviews(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    text = models.TextField(blank=True)
+    score = models.IntegerField()
+    author = models.ImageField()
