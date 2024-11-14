@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from api.serializers import (
     CategorySerializer, GenreSerializer, TitleSerializer, TitleCreateSerializer
 )
-from api.models import Category, Genre, Title
+from titles.models import Category, Genre, Title
 from api.permissions import IsAdminOrReadOnly
 
 

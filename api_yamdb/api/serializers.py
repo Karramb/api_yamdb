@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 import datetime as dt
 
-from api.models import Category, Genre, Title, TitleGenre
+from titles.models import Category, Genre, Title, TitleGenre
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -82,7 +82,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         # добавляю категории
-        representation['category'] = dict('slug': )'test'
+        # representation['category'] = 'test'
         # добавляю жанр
-        representation['genre'] = 'test'
+        # representation['genre'] = 'test'
         return representation
