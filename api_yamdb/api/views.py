@@ -49,11 +49,11 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
 
-    # retrieve получения определённого объекта
     def get_serializer_class(self):
-        # получения списка объектов или одного чтоб выводило категорию - словарь
+        # получения списка объектов или одного чтоб выводило категорию как словарь
         if self.action == 'list' or self.action == 'retrieve':
             return TitleSerializer
-        if self.action == 'create':      # create создание объекта = post
+        # для post и patch задаем категории и жанр как строки, списки строк
+        if self.action == 'create' or self.action == 'partial_update':
             return TitleCreateSerializer
         return TitleSerializer

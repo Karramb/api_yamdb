@@ -11,9 +11,7 @@ class Category(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        # return '%s: %s' % (self.name, self.slug)
         return self.name
-    # f'{self.name=} {self.slug=}'
 
 
 class Genre(models.Model):
@@ -37,7 +35,6 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField()
     description = models.TextField(blank=True, null=True)
     genre = models.ManyToManyField(Genre, through='TitleGenre')
-    # null=True убрать??
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
         related_name='categories', null=True

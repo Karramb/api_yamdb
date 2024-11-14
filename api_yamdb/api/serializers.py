@@ -9,9 +9,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        # временно оставим id для удобства
-        # fields = '__all__'
-        # вот так по ТЗ:
         fields = ('name', 'slug')
 
 
@@ -19,9 +16,6 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        # временно оставим id для удобства
-        # fields = '__all__'
-        # вот так по ТЗ:
         fields = ('name', 'slug')
 
 
@@ -54,8 +48,41 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         genres = validated_data.pop('genre')
+        for genre in genres:
+            if not Genre.objects.filter(slug=genre).exists():
+                raise serializers.ValidationError(
+                    "Отсутствует обязательное поле или оно не корректно."
+                )
         title = Title.objects.create(**validated_data)
         for genre in genres:
-            id = Genre.objects.get(slug=genre)
-            TitleGenre.objects.create(title=title, genre=id)
+            TitleGenre.objects.create(title=title, genre=Genre.objects.get(slug=genre))
         return title
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.year = validated_data.get('year', instance.year)
+        instance.description = validated_data.get('description', instance.description)
+        instance.category = validated_data.get('category', instance.category)
+
+        genres = validated_data.pop('genre')
+        print(genres)
+        lst = []
+        for genre in genres:
+            if not Genre.objects.filter(slug=genre).exists():
+                raise serializers.ValidationError(
+                    "Отсутствует обязательное поле или оно не корректно."
+                )
+            current_genre = Genre.objects.get(slug=genre)
+            lst.append(current_genre)
+            instance.genre.set(lst)
+
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # добавляю категории
+        representation['category'] = dict('slug': )'test'
+        # добавляю жанр
+        representation['genre'] = 'test'
+        return representation
