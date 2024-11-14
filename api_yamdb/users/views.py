@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from .mixins import UserIsNotAuthenticated
 from .models import CustomUser
+from .permissions import OnlyAdmin
 from .serializers import UserCreateSerializer, UserRecieveTokenSerializer, UserSerializer
 
 
@@ -20,6 +21,9 @@ class UserCreateViewSet(mixins.CreateModelMixin,
 
     def create(self, request):
         context = {}
+        if request.data.get('username') is None or request.data.get('email') is None:
+            serializer = UserCreateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
         if CustomUser.objects.filter(email=request.data['email'], username=request.data['username']):
             user = CustomUser.objects.get(email=request.data['email'], username=request.data['username'])
             context['email'] = user.email
@@ -70,6 +74,7 @@ class UserViewSet(mixins.ListModelMixin,
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
+    permission_classes = (OnlyAdmin,)
 
     @action(
         detail=False,
