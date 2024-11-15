@@ -13,10 +13,8 @@ class CategoryViewSet(
     mixins.CreateModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
-    # только добавление, чтение и удаление, остальное не по ТЗ
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # т к по ТЗ д быть удаление по ...categories/{slug}/
     lookup_field = 'slug'
     # чтение у всех, а добавление и удаление admin
     # permission_classes = (IsAdminOrReadOnly,)
@@ -31,7 +29,6 @@ class GenreViewSet(
 ):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    # т к по ТЗ д быть удаление по ...genres/{slug}/
     lookup_field = 'slug'
     # чтение у всех, а добавление и удаление admin
     # permission_classes = (IsAdminOrReadOnly,)
@@ -50,10 +47,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
 
     def get_serializer_class(self):
-        # получения списка объектов или одного чтоб выводило категорию как словарь
         if self.action == 'list' or self.action == 'retrieve':
             return TitleSerializer
-        # для post и patch задаем категории и жанр как строки, списки строк
         if self.action == 'create' or self.action == 'partial_update':
             return TitleCreateSerializer
         return TitleSerializer
