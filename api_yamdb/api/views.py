@@ -1,12 +1,15 @@
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import BadRequest
+from django.db import models
 
 from api.serializers import (
-    CategorySerializer, GenreSerializer, TitleSerializer, TitleCreateSerializer
+    CategorySerializer, GenreSerializer, TitleSerializer, TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
 )
-from titles.models import Category, Genre, Title
-from api.permissions import IsAdminOrReadOnly
+from titles.models import Category, Genre, Title, Reviews
+from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 
 class CategoryViewSet(
@@ -38,7 +41,6 @@ class GenreViewSet(
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
     serializer_class = TitleSerializer
     # надо убрать put, но моему ревьюеру этот метод не нравился
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -52,3 +54,48 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action == 'create' or self.action == 'partial_update':
             return TitleCreateSerializer
         return TitleSerializer
+
+    def get_queryset(self):
+        return Title.objects.annotate(rating=models.Avg('reviews__score'))
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerlizer
+    # permission_classes = (IsOwnerOrReadOnly,)
+
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs['title_id'])
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save(
+                # author=self.request.user,
+                author=9,
+                title=self.get_title(),
+            )
+        except Exception:
+            raise BadRequest("Один пользвователь - один отзыв")
+
+    def get_queryset(self):
+        title = self.get_title()
+        return title.reviews.all()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerlizer
+    # permission_classes = (IsOwnerOrReadOnly,)
+
+    def get_review(self):
+        return get_object_or_404(Reviews, pk=self.kwargs['review_id'])
+
+    def perform_create(self, serializer):
+        serializer.save(
+            # author=self.request.user,
+            author=1,
+            review=self.get_review()
+        )
+
+    def get_queryset(self):
+        review = self.get_review()
+        return review.comments.all()
+

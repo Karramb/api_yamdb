@@ -1,4 +1,6 @@
-from django.db import models
+from django.db importmodels
+
+# from users.models import CustomUser
 
 
 class Category(models.Model):
@@ -52,5 +54,53 @@ class TitleGenre(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
-    def __str__(self):
+    def __str__(se lf):
         return f'{self.title} {self.genre}'
+
+
+class Reviews(models.Model):
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE,
+        related_name='reviews', blank=True)
+    text = models.TextField()
+    score = models.IntegerField()
+    pub_date = models.DateTimeField(auto_now_add=True)
+    author = models.IntegerField(null=True)
+    # author = models.ForeignKey(
+    #     CustomUser, related_name='reviews', on_delete=models.CASCADE,
+    # )
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'отзывы'
+        ordering = ('pub_date', 'id')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author',],
+                name='unique_follow',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.title.name}, {self.score}'
+
+
+class Comments(models.Model):
+    text = models.TextField()
+    review = models.ForeignKey(
+        Reviews, on_delete=models.CASCADE, related_name='comments'
+    )
+    # author = models.ForeignKey(
+    #     User, on_delete=models.CASCADE, related_name='comments'
+    # )
+    author = models.IntegerField(null=True)
+    pub_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'коментарии'
+        ordering = ('pub_date', 'id')
+
+    def __str__(self):
+        return self.text[:10]
+

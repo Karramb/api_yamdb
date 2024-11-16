@@ -1,9 +1,8 @@
 from rest_framework import serializers
 
-import datetime as dt
+import datetime as d
 
-from titles.models import Category, Genre, Title, TitleGenre
-
+from titles.models import Category, Genre, Title, TitleGenre, Reviews, Comments
 
 class CategorySerializer(serializers.ModelSerializer):
 
@@ -22,6 +21,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False)
     genre = GenreSerializer(many=True)
+    rating = serializers.IntegerField()
 
     class Meta:
         model = Title
@@ -84,3 +84,31 @@ class TitleCreateSerializer(serializers.ModelSerializer):
                 instance.genre, many=True
             ).data
         return answer
+
+
+class ReviewSerlizer(serializers.ModelSerializer):
+    # author = serializers.SlugRelatedField(
+    #     read_only=True, slug_field='reviews'
+    # )
+
+    class Meta:
+        model = Reviews
+        fields = '__all__'
+
+    def validate_score(self, value):
+        if value < 1 or value > 10:
+            raise serializers.ValidationError(
+                'Оценка должна быть в диапазоне от 1 до 10'
+            )
+        return value
+
+
+class CommentSerlizer(serializers.ModelSerializer):
+    # author = serializers.SlugRelatedField(
+    #     read_only=True, slug_field='comments'
+    # )
+
+    class Meta:
+        model = Comments
+        fields = '__all__'
+        read_only_fields = ('review',)
