@@ -4,7 +4,6 @@ from django.db importmodels
 
 
 class Category(models.Model):
-    """Категории."""
     name = models.CharField(max_length=256)
     slug = models.CharField(r'^[-a-zA-Z0-9_]+$', max_length=50, unique=True)
 
@@ -16,7 +15,6 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    """Жанр."""
     name = models.CharField(max_length=256)
     slug = models.CharField(r'^[-a-zA-Z0-9_]+$', max_length=50, unique=True)
 
@@ -28,7 +26,6 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    """Произведения."""
     name = models.CharField(max_length=256)
     # этот тип выбрала т к у него значения от 0 до 32767.
     year = models.PositiveSmallIntegerField()
@@ -47,7 +44,6 @@ class Title(models.Model):
 
 
 class TitleGenre(models.Model):
-    """Связь произведения и жанров."""
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
