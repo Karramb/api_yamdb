@@ -98,3 +98,4 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         review = self.get_review()
         return review.comments.all()
+
