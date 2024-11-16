@@ -63,18 +63,21 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerlizer
     # permission_classes = (IsOwnerOrReadOnly,)
 
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs['title_id'])
+
     def perform_create(self, serializer):
         try:
             serializer.save(
                 # author=self.request.user,
-                author=2,
-                title=get_object_or_404(Title, pk=self.kwargs['title_id']),
+                author=9,
+                title=self.get_title(),
             )
         except Exception:
-            raise BadRequest
+            raise BadRequest("Один пользвователь - один отзыв")
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs['title_id'])
+        title = self.get_title()
         return title.reviews.all()
 
 
@@ -82,13 +85,16 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerlizer
     # permission_classes = (IsOwnerOrReadOnly,)
 
+    def get_review(self):
+        return get_object_or_404(Reviews, pk=self.kwargs['review_id'])
+
     def perform_create(self, serializer):
         serializer.save(
             # author=self.request.user,
             author=1,
-            review=get_object_or_404(Reviews, pk=self.kwargs['review_id'])
+            review=self.get_review()
         )
 
     def get_queryset(self):
-        review = get_object_or_404(Reviews, pk=self.kwargs['review_id'])
+        review = self.get_review()
         return review.comments.all()

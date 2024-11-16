@@ -88,9 +88,9 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerlizer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='reviews'
-    )
+    # author = serializers.SlugRelatedField(
+    #     read_only=True, slug_field='reviews'
+    # )
 
     class Meta:
         model = Reviews
@@ -111,5 +111,5 @@ class CommentSerlizer(serializers.ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = ('__all__')
+        fields = '__all__'
         read_only_fields = ('review',)
