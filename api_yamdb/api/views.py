@@ -9,7 +9,7 @@ from api.serializers import (
     CategorySerializer, GenreSerializer, TitleSerializer,
     TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
 )
-from titles.models import Category, Genre, Title, Review
+from reviews.models import Category, Genre, Title, Review
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 
