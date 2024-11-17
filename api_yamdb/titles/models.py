@@ -1,4 +1,4 @@
-from django.db importmodels
+from django.db import models
 
 # from users.models import CustomUser
 

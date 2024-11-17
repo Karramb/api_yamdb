@@ -6,7 +6,8 @@ from django.core.exceptions import BadRequest
 from django.db import models
 
 from api.serializers import (
-    CategorySerializer, GenreSerializer, TitleSerializer, TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
+    CategorySerializer, GenreSerializer, TitleSerializer,
+    TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
 )
 from titles.models import Category, Genre, Title, Reviews
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
