@@ -8,7 +8,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        
+
         # на Суперпользователя Django
         # Даже если изменить пользовательскую роль суперпользователя — это не лишит его прав администратора.
         # реализовать Ошибки: 401, 403
@@ -20,11 +20,15 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     #             с подтягиванием константы думаю лучше:
     #             or custom_user.role == ROLE[3])
 
-
+# Permissins для проверки
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
                 or request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        return request.user == obj.author
+        if request.method not in permissions.SAFE_METHODS:
+            role = request.user.role
+        else:
+            role = 'anonim'
+        return request.method in permissions.SAFE_METHODS or request.user == obj.author or role in ['moderator', 'admin']

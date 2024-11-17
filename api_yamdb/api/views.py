@@ -3,13 +3,13 @@ from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import BadRequest
-from django.db import models
+from django.db import models, IntegrityError
 
 from api.serializers import (
     CategorySerializer, GenreSerializer, TitleSerializer,
     TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
 )
-from titles.models import Category, Genre, Title, Reviews
+from titles.models import Category, Genre, Title, Review
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 
@@ -62,19 +62,23 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerlizer
-    # permission_classes = (IsOwnerOrReadOnly,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    permission_classes = (IsOwnerOrReadOnly,)
 
     def get_title(self):
         return get_object_or_404(Title, pk=self.kwargs['title_id'])
 
     def perform_create(self, serializer):
+        # serializer.save(
+        #     author=self.request.user,
+        #     title=self.get_title(),
+        # )
         try:
             serializer.save(
-                # author=self.request.user,
-                author=9,
+                author=self.request.user,
                 title=self.get_title(),
             )
-        except Exception:
+        except IntegrityError:
             raise BadRequest("Один пользвователь - один отзыв")
 
     def get_queryset(self):
@@ -84,19 +88,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerlizer
-    # permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_review(self):
-        return get_object_or_404(Reviews, pk=self.kwargs['review_id'])
+        return get_object_or_404(Review, pk=self.kwargs['review_id'])
 
     def perform_create(self, serializer):
         serializer.save(
-            # author=self.request.user,
-            author=1,
+            author=self.request.user,
             review=self.get_review()
         )
 
     def get_queryset(self):
         review = self.get_review()
         return review.comments.all()
-
