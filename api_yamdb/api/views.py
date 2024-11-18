@@ -11,6 +11,7 @@ from api.serializers import (
 )
 from reviews.models import Category, Genre, Title, Review
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from .filters import TitleFilter
 
 
 class CategoryViewSet(
@@ -34,7 +35,6 @@ class GenreViewSet(
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
-    # чтение у всех, а добавление и удаление admin
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
@@ -43,11 +43,10 @@ class GenreViewSet(
 
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
-    # надо убрать put, но моему ревьюеру этот метод не нравился
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
+    filterset_class = TitleFilter
     permission_classes = (IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
@@ -70,10 +69,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return get_object_or_404(Title, pk=self.kwargs['title_id'])
 
     def perform_create(self, serializer):
-        # serializer.save(
-        #     author=self.request.user,
-        #     title=self.get_title(),
-        # )
         try:
             serializer.save(
                 author=self.request.user,

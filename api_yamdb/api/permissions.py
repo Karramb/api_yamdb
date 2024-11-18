@@ -2,21 +2,18 @@ from rest_framework import permissions
 
 from users.models import UserRoles
 
-# from users.models import CustomUser
-# from users.models import ROLE
-
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.method in permissions.SAFE_METHODS or (request.user.is_authenticated
-                and (
-                    request.user.role == UserRoles.admin.name
-                    or request.user.is_superuser
-                )
-                )
+        return request.method in permissions.SAFE_METHODS or (
+            request.user.is_authenticated
+            and (
+                request.user.role == UserRoles.admin.name
+                or request.user.is_superuser
+            )
+        )
 
 
-# Permissins для проверки
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
@@ -27,4 +24,15 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             role = request.user.role
         else:
             role = 'anonim'
-        return request.method in permissions.SAFE_METHODS or request.user == obj.author or role in ['moderator', 'admin']
+        return (request.method in permissions.SAFE_METHODS
+                or request.user == obj.author or role in ['moderator', 'admin'])
+
+
+class OnlyAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (request.user.is_authenticated
+                and (
+                    request.user.role == UserRoles.admin.name
+                    or request.user.is_superuser
+                )
+                )

@@ -1,15 +1,15 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .mixins import UserIsNotAuthenticated
 from .models import CustomUser
-from .permissions import OnlyAdmin
-from .serializers import UserCreateSerializer, UserRecieveTokenSerializer, UserSerializer
+from api.permissions import OnlyAdmin
+from .serializers import (UserCreateSerializer,
+                          UserRecieveTokenSerializer, UserSerializer)
 
 
 class UserCreateViewSet(mixins.CreateModelMixin,
@@ -21,17 +21,22 @@ class UserCreateViewSet(mixins.CreateModelMixin,
 
     def create(self, request):
         context = {}
-        if request.data.get('username') is None or request.data.get('email') is None:
+        if (request.data.get('username') is None
+                or request.data.get('email') is None):
             serializer = UserCreateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-        if CustomUser.objects.filter(email=request.data['email'], username=request.data['username']):
-            user = CustomUser.objects.get(email=request.data['email'], username=request.data['username'])
+        if CustomUser.objects.filter(email=request.data['email'],
+                                     username=request.data['username']):
+            user = CustomUser.objects.get(email=request.data['email'],
+                                          username=request.data['username'])
             context['email'] = user.email
             context['username'] = user.username
         else:
             serializer = UserCreateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            user, _ = CustomUser.objects.get_or_create(**serializer.validated_data)
+            user, _ = CustomUser.objects.get_or_create(
+                **serializer.validated_data
+            )
             confirmation_code = default_token_generator.make_token(user)
             context = serializer.data
         confirmation_code = default_token_generator.make_token(user)

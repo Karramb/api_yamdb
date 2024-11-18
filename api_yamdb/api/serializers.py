@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-import datetime as dt
-
 from reviews.models import Category, Genre, Title, TitleGenre, Review, Comments
 
 
@@ -48,19 +46,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             ) for genre in genres
         )
         return title
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.year = validated_data.get('year', instance.year)
-        instance.description = validated_data.get(
-            'description', instance.description
-        )
-        instance.category = validated_data.get('category', instance.category)
-        instance.genre.set(
-            Genre.objects.filter(slug__in=validated_data.pop('genre'))
-        )
-        instance.save()
-        return instance
 
     def to_representation(self, instance):
         answer = super().to_representation(instance)
