@@ -39,18 +39,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         model = Title
         fields = '__all__'
 
-    def validate(self, data):
-        genres = self.initial_data.get('genre')
-        if not Genre.objects.filter(slug__in=genres).exists():
-            raise serializers.ValidationError(
-                'Отсутствует обязательное поле или оно не корректно.'
-            )
-        if data['year'] > dt.datetime.now().year:
-            raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего.'
-            )
-        return data
-
     def create(self, validated_data):
         genres = validated_data.pop('genre')
         title = Title.objects.create(**validated_data)

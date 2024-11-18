@@ -5,7 +5,7 @@ from users.models import CustomUser
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.CharField(r'^[-a-zA-Z0-9_]+$', max_length=50, unique=True)
+    slug = models.SlugField(r'^[-a-zA-Z0-9_]+$', max_length=50, unique=True)
 
     class Meta:
         ordering = ('name',)
@@ -16,7 +16,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.CharField(r'^[-a-zA-Z0-9_]+$', max_length=50, unique=True)
+    slug = models.SlugField(r'^[-a-zA-Z0-9_]+$', max_length=50, unique=True)
 
     class Meta:
         ordering = ('name',)
