@@ -21,7 +21,7 @@ class CategoryViewSet(
     serializer_class = CategorySerializer
     lookup_field = 'slug'
     # чтение у всех, а добавление и удаление admin
-    # permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -35,7 +35,7 @@ class GenreViewSet(
     serializer_class = GenreSerializer
     lookup_field = 'slug'
     # чтение у всех, а добавление и удаление admin
-    # permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)

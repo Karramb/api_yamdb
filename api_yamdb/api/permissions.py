@@ -14,11 +14,12 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         # реализовать Ошибки: 401, 403
         return bool(request.user and request.user.is_staff)
 
-    # def has_object_permission(self, request, view, obj):
-    #     return (request.method in permissions.SAFE_METHODS
-    #             or custom_user.role == 'Admin')
-    #             с подтягиванием константы думаю лучше:
-    #             or custom_user.role == ROLE[3])
+    def has_object_permission(self, request, view, obj):
+        return True
+        #  (request.method in permissions.SAFE_METHODS
+        #         or custom_user.role == 'Admin')
+        #         с подтягиванием константы думаю лучше:
+        #         or custom_user.role == ROLE[3])
 
 # Permissins для проверки
 class IsOwnerOrReadOnly(permissions.BasePermission):
