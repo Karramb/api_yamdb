@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 import datetime as dt
 
-from titles.models import Category, Genre, Title, TitleGenre, Reviews, Comments
+from reviews.models import Category, Genre, Title, TitleGenre, Review, Comments
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -88,12 +88,12 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerlizer(serializers.ModelSerializer):
-    # author = serializers.SlugRelatedField(
-    #     read_only=True, slug_field='reviews'
-    # )
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
 
     class Meta:
-        model = Reviews
+        model = Review
         fields = '__all__'
 
     def validate_score(self, value):
@@ -105,9 +105,9 @@ class ReviewSerlizer(serializers.ModelSerializer):
 
 
 class CommentSerlizer(serializers.ModelSerializer):
-    # author = serializers.SlugRelatedField(
-    #     read_only=True, slug_field='comments'
-    # )
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
 
     class Meta:
         model = Comments

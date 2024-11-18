@@ -1,6 +1,6 @@
 from django.db import models
 
-# from users.models import CustomUser
+from users.models import CustomUser
 
 
 class Category(models.Model):
@@ -51,17 +51,16 @@ class TitleGenre(models.Model):
         return f'{self.title} {self.genre}'
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         related_name='reviews', blank=True)
     text = models.TextField()
     score = models.IntegerField()
     pub_date = models.DateTimeField(auto_now_add=True)
-    author = models.IntegerField(null=True)
-    # author = models.ForeignKey(
-    #     CustomUser, related_name='reviews', on_delete=models.CASCADE,
-    # )
+    author = models.ForeignKey(
+        CustomUser, related_name='reviews', on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -69,7 +68,7 @@ class Reviews(models.Model):
         ordering = ('pub_date', 'id')
         constraints = [
             models.UniqueConstraint(
-                fields=['author',],
+                fields=['author', 'title'],
                 name='unique_follow',
             ),
         ]
@@ -81,12 +80,11 @@ class Reviews(models.Model):
 class Comments(models.Model):
     text = models.TextField()
     review = models.ForeignKey(
-        Reviews, on_delete=models.CASCADE, related_name='comments'
+        Review, on_delete=models.CASCADE, related_name='comments'
     )
-    # author = models.ForeignKey(
-    #     User, on_delete=models.CASCADE, related_name='comments'
-    # )
-    author = models.IntegerField(null=True)
+    author = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name='comments'
+    )
     pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -96,4 +94,3 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.text[:10]
-
