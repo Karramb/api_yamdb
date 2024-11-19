@@ -2,7 +2,7 @@ import datetime as dt
 from django.core.exceptions import ValidationError
 from django import forms
 
-from reviews.models import Title
+from reviews.models import Title, Review
 
 class TitleForm(forms.ModelForm):
 
@@ -16,14 +16,17 @@ class TitleForm(forms.ModelForm):
             raise ValidationError(
                 'Год выпуска не может быть больше текущего.'
             )
-        # Так жанры не сохраняет
-        # genre = data.get('genre', None)
-        # if genre is None:
-        #     raise ValidationError(
-        #         'Отсутствует обязательное поле Жанр или оно не корректно.'
-        #     )
+
 
 class ReviewForm(forms.ModelForm):
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super(ReviewForm, self).__init__(*args, **kwargs)
+        self.fields['title'] = forms.ModelChoiceField(queryset=Title.objects.all(), label='Произведение')
 
     def clean(self):
         data = super().clean()

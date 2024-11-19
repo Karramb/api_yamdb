@@ -1,5 +1,7 @@
 from django.db import models
+from django.db.models.signals import m2m_changed
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
 from users.models import CustomUser
 
@@ -56,7 +58,7 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 
 class TitleGenre(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE, verbose_name='Произведение')
@@ -83,8 +85,8 @@ class Review(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Отзыв'
-        verbose_name_plural = 'отзывы'
+        verbose_name = 'отзыв'
+        verbose_name_plural = 'Отзывы'
         ordering = ('pub_date', 'id')
         constraints = [
             models.UniqueConstraint(
@@ -108,8 +110,8 @@ class Comments(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Комментарий'
-        verbose_name_plural = 'коментарии'
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'Комментарии'
         ordering = ('pub_date', 'id')
 
     def __str__(self):
