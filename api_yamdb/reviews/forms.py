@@ -1,0 +1,35 @@
+import datetime as dt
+from django.core.exceptions import ValidationError
+from django import forms
+
+from reviews.models import Title
+
+class TitleForm(forms.ModelForm):
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+    def clean(self):
+        data = super().clean()
+        if data.get('year') > dt.datetime.now().year:
+            raise ValidationError(
+                'Год выпуска не может быть больше текущего.'
+            )
+        # Так жанры не сохраняет
+        # genre = data.get('genre', None)
+        # if genre is None:
+        #     raise ValidationError(
+        #         'Отсутствует обязательное поле Жанр или оно не корректно.'
+        #     )
+
+class ReviewForm(forms.ModelForm):
+
+    def clean(self):
+        data = super().clean()
+        value = data.get('score')
+        if value < 1 or value > 10:
+            raise ValidationError(
+                'Оценка должна быть в диапазоне от 1 до 10'
+            )
+
