@@ -148,7 +148,4 @@ dmypy.json
 # папки со статикой и медиа
 media/
 static/data
-
-# папки с тестами и запросами
-tests/
-postman_collection/
+св фзш_нфьви
