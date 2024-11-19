@@ -24,7 +24,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             regex=r'^[\w.@+-]+$',
             message='Ник содержит недопустимые символы'
         )],
-        verbose_name='Ник    пользователя',
+        verbose_name='Ник пользователя',
     )
     email = models.EmailField(
         max_length=254,
