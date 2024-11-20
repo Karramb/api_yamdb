@@ -65,13 +65,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return get_object_or_404(Title, pk=self.kwargs['title_id'])
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(
-                author=self.request.user,
-                title=self.get_title(),
-            )
-        except IntegrityError:
-            raise BadRequest("Один пользвователь - один отзыв")
+        serializer.save(
+            author=self.request.user,
+            title=self.get_title(),
+        )
 
     def get_queryset(self):
         title = self.get_title()
