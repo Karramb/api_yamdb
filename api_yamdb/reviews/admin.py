@@ -10,11 +10,13 @@ admin.site.empty_value_display = 'Не задано'
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
+    search_fields = ('name',)
 
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
+    search_fields = ('name',)
 
 
 class TitleGenreInline(admin.TabularInline):
@@ -45,9 +47,13 @@ admin.site.register(Title, TitleAdmin)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('title', 'text', 'score', 'pub_date', 'author')
     form = ReviewForm
+    search_fields = ('title', 'text')
+    list_filter = ('score', 'pub_date', 'author')
 
 @admin.register(Comments)
 class CommentsAdmin(admin.ModelAdmin):
     list_display = ('text', 'review', 'pub_date', 'author')
+    search_fields = ('text',)
+    list_filter = ('pub_date', 'author')
 
 
