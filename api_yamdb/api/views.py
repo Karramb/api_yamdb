@@ -21,9 +21,7 @@ class CategoryViewSet(
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
-    # чтение у всех, а добавление и удаление admin
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
@@ -36,7 +34,6 @@ class GenreViewSet(
     serializer_class = GenreSerializer
     lookup_field = 'slug'
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
@@ -44,7 +41,6 @@ class GenreViewSet(
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
-    pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
     permission_classes = (IsAdminOrReadOnly,)
@@ -57,7 +53,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleSerializer
 
     def get_queryset(self):
-        return Title.objects.annotate(rating=models.Avg('reviews__score'))
+        return Title.objects.annotate(rating=models.Avg('reviews__score')).order_by('id')
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -69,13 +65,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return get_object_or_404(Title, pk=self.kwargs['title_id'])
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(
-                author=self.request.user,
-                title=self.get_title(),
-            )
-        except IntegrityError:
-            raise BadRequest("Один пользвователь - один отзыв")
+        serializer.save(
+            author=self.request.user,
+            title=self.get_title(),
+        )
 
     def get_queryset(self):
         title = self.get_title()

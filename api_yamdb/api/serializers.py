@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import datetime as dt
 
 from reviews.models import Category, Genre, Title, TitleGenre, Review, Comments
 
@@ -37,8 +38,25 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         model = Title
         fields = '__all__'
 
+    def validate_year(self, value):
+        if value > dt.datetime.now().year:
+            raise serializers.ValidationError(
+                'Год выпуска не может быть больше текущего.'
+            )
+        return value
+
     def create(self, validated_data):
+        genres = self.validated_data.get('genre')
+        if genres is None:
+            raise serializers.ValidationError(
+                'Отсутствует обязательное поле или оно не корректно.'
+            )
         genres = validated_data.pop('genre')
+        for genre in genres:
+            if not Genre.objects.filter(slug=genre).exists():
+                raise serializers.ValidationError(
+                    f'Объект с slug={genre} не существует.'
+                ) 
         title = Title.objects.create(**validated_data)
         TitleGenre.objects.bulk_create(
             TitleGenre(
@@ -46,6 +64,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             ) for genre in genres
         )
         return title
+    
 
     def to_representation(self, instance):
         answer = super().to_representation(instance)
@@ -75,6 +94,15 @@ class ReviewSerlizer(serializers.ModelSerializer):
                 'Оценка должна быть в диапазоне от 1 до 10'
             )
         return value
+    
+    def create(self, validated_data):
+        author = self.context['request'].user
+        title = self.context['view'].kwargs['title_id']
+        if Review.objects.filter(title=title, author=author).exists():
+            raise serializers.ValidationError(
+                'Один пользвователь - один отзыв'
+            )
+        return Review.objects.create(**validated_data)
 
 
 class CommentSerlizer(serializers.ModelSerializer):
