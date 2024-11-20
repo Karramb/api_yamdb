@@ -44,7 +44,7 @@ class UserCreateViewSet(mixins.CreateModelMixin,
             subject='Код подтверждения',
             message=f'Код подтверждения: {confirmation_code}',
             from_email='birthday_form@acme.not',
-            recipient_list=[user.email,],
+            recipient_list=[user.email, ],
             fail_silently=True,
         )
         return Response(context, status=status.HTTP_200_OK)

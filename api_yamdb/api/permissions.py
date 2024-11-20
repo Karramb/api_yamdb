@@ -25,7 +25,8 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         else:
             role = 'anonim'
         return (request.method in permissions.SAFE_METHODS
-                or request.user == obj.author or role in ['moderator', 'admin'])
+                or request.user == obj.author
+                or role in ['moderator', 'admin'])
 
 
 class OnlyAdmin(permissions.BasePermission):
