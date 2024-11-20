@@ -94,6 +94,15 @@ class ReviewSerlizer(serializers.ModelSerializer):
                 'Оценка должна быть в диапазоне от 1 до 10'
             )
         return value
+    
+    def create(self, validated_data):
+        author = self.context['request'].user
+        title = self.context['view'].kwargs['title_id']
+        if Review.objects.filter(title=title, author=author).exists():
+            raise serializers.ValidationError(
+                'Один пользвователь - один отзыв'
+            )
+        return Review.objects.create(**validated_data)
 
 
 class CommentSerlizer(serializers.ModelSerializer):
