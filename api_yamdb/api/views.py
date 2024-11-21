@@ -1,9 +1,6 @@
 from rest_framework import filters, mixins, viewsets
-from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import BadRequest
-from django.db import models, IntegrityError
 
 from api.serializers import (
     CategorySerializer, GenreSerializer, TitleSerializer,
@@ -53,7 +50,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleSerializer
 
     def get_queryset(self):
-        return Title.objects.annotate(rating=models.Avg('reviews__score')).order_by('id')
+        return Title.objects.annotate(
+            rating=models.Avg('reviews__score')).order_by('id')
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

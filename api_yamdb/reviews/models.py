@@ -1,7 +1,5 @@
 from django.db import models
-from django.db.models.signals import m2m_changed
 from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
 
 from users.models import CustomUser
 
@@ -9,8 +7,11 @@ from users.models import CustomUser
 class Category(models.Model):
     name = models.CharField('Название', max_length=256)
     slug = models.SlugField(
-        max_length=50, unique=True, 
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$', message='Имя содержит недопустимые символы')],
+        max_length=50, unique=True,
+        validators=[
+            RegexValidator(
+                regex=r'^[-a-zA-Z0-9_]+$',
+                message='Имя содержит недопустимые символы')],
         verbose_name='Слаг'
     )
 
@@ -19,7 +20,6 @@ class Category(models.Model):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
-
     def __str__(self):
         return self.name
 
@@ -27,8 +27,11 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField('Название', max_length=256)
     slug = models.SlugField(
-        max_length=50, unique=True, 
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$', message='Имя содержит недопустимые символы')],
+        max_length=50, unique=True,
+        validators=[
+            RegexValidator(
+                regex=r'^[-a-zA-Z0-9_]+$',
+                message='Имя содержит недопустимые символы')],
         verbose_name='Слаг'
     )
 
@@ -45,7 +48,8 @@ class Title(models.Model):
     name = models.CharField('Название', max_length=256)
     year = models.PositiveSmallIntegerField('Год')
     description = models.TextField('Описание', blank=True, null=True)
-    genre = models.ManyToManyField(Genre, through='TitleGenre', verbose_name='Жанр')
+    genre = models.ManyToManyField(
+        Genre, through='TitleGenre', verbose_name='Жанр')
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
         related_name='categories', null=True, verbose_name='Категория'
@@ -58,11 +62,13 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class TitleGenre(models.Model):
-    title = models.ForeignKey(Title, on_delete=models.CASCADE, verbose_name='Произведение')
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='Жанр')
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, verbose_name='Произведение')
+    genre = models.ForeignKey(
+        Genre, on_delete=models.CASCADE, verbose_name='Жанр')
 
     class Meta:
         verbose_name = 'Жанр произведения'
@@ -78,7 +84,8 @@ class Review(models.Model):
         related_name='reviews', blank=True, verbose_name='Произведение')
     text = models.TextField('Отзыв')
     score = models.IntegerField('Оценка')
-    pub_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
+    pub_date = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата публикации')
     author = models.ForeignKey(
         CustomUser, related_name='reviews', on_delete=models.CASCADE,
         verbose_name='Автор отзыва'
@@ -102,10 +109,16 @@ class Review(models.Model):
 class Comments(models.Model):
     text = models.TextField('Комментарий')
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments', verbose_name='Отзыв'
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Отзыв'
     )
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='comments', verbose_name='Автор комментария'
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор комментария'
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 

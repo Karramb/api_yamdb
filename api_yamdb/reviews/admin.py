@@ -32,13 +32,13 @@ class TitleAdmin(admin.ModelAdmin):
     list_editable = ('category',)
     search_fields = ('name',)
     list_filter = ('category',)
-    # поля, при клике на которые можно перейти на страницу просмотра и редактирования записи. 
     list_display_links = ('name',)
     inlines = (TitleGenreInline,)
 
     def get_genre(self, obj):
         return ", ".join([genre.name for genre in obj.genre.all()])
     get_genre.short_description = 'Жанр(ы)'
+
 
 admin.site.register(Title, TitleAdmin)
 
@@ -50,10 +50,9 @@ class ReviewAdmin(admin.ModelAdmin):
     search_fields = ('title', 'text')
     list_filter = ('score', 'pub_date', 'author')
 
+
 @admin.register(Comments)
 class CommentsAdmin(admin.ModelAdmin):
     list_display = ('text', 'review', 'pub_date', 'author')
     search_fields = ('text',)
     list_filter = ('pub_date', 'author')
-
-

@@ -4,6 +4,7 @@ from django import forms
 
 from reviews.models import Title, Review
 
+
 class TitleForm(forms.ModelForm):
 
     class Meta:
@@ -23,10 +24,11 @@ class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = '__all__'
-    
+
     def __init__(self, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
-        self.fields['title'] = forms.ModelChoiceField(queryset=Title.objects.all(), label='Произведение')
+        self.fields['title'] = forms.ModelChoiceField(
+            queryset=Title.objects.all(), label='Произведение')
 
     def clean(self):
         data = super().clean()
@@ -35,4 +37,3 @@ class ReviewForm(forms.ModelForm):
             raise ValidationError(
                 'Оценка должна быть в диапазоне от 1 до 10'
             )
-

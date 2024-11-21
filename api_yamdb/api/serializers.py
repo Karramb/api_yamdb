@@ -56,7 +56,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             if not Genre.objects.filter(slug=genre).exists():
                 raise serializers.ValidationError(
                     f'Объект с slug={genre} не существует.'
-                ) 
+                )
         title = Title.objects.create(**validated_data)
         TitleGenre.objects.bulk_create(
             TitleGenre(
@@ -64,7 +64,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             ) for genre in genres
         )
         return title
-    
 
     def to_representation(self, instance):
         answer = super().to_representation(instance)
@@ -94,7 +93,7 @@ class ReviewSerlizer(serializers.ModelSerializer):
                 'Оценка должна быть в диапазоне от 1 до 10'
             )
         return value
-    
+
     def create(self, validated_data):
         author = self.context['request'].user
         title = self.context['view'].kwargs['title_id']
