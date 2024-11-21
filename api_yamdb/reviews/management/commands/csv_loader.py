@@ -36,7 +36,6 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         files = self.load_file(PATH)
         for filename in files:
-            print(filename)
             with open(filename, 'r', encoding="utf-8") as file:
                 csv_reader = csv.DictReader(file)
                 model = None
