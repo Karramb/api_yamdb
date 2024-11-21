@@ -61,3 +61,5 @@ class Command(BaseCommand):
                                   f'ошибка: {e}')
                 else:
                     print(f'Не найдена модель для {filename}!')
+
+        print('Загрузка завершена!')
