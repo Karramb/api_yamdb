@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import Review, Title, TitleGenre, Genre, Category, Comments
-from .forms import TitleForm, ReviewForm
+from reviews.models import Review, Title, TitleGenre, Genre, Category, Comments
+from reviews.forms import TitleForm, ReviewForm
 
-# Вместо пустого значения в админке будет отображена строка "Не задано".
+
 admin.site.empty_value_display = 'Не задано'
 
 
@@ -28,7 +28,6 @@ class TitleGenreInline(admin.TabularInline):
 class TitleAdmin(admin.ModelAdmin):
     form = TitleForm
     list_display = ('name', 'year', 'description', 'category', 'get_genre')
-    # какие поля можно редактировать прямо на странице списка объектов
     list_editable = ('category',)
     search_fields = ('name',)
     list_filter = ('category',)

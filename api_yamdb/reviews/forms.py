@@ -16,7 +16,8 @@ class TitleForm(forms.ModelForm):
         year = data.get('year', None)
         if year is not None:
             if year > dt.datetime.now().year:
-                raise ValidationError('Год выпуска не может быть больше текущего.'
+                raise ValidationError(
+                    'Год выпуска не может быть больше текущего.'
             )
 
 
@@ -36,5 +37,6 @@ class ReviewForm(forms.ModelForm):
         value = data.get('score', None)
         if value is not None:
             if value < 1 or value > 10:
-                raise ValidationError('Оценка должна быть в диапазоне от 1 до 10'
+                raise ValidationError(
+                    'Оценка должна быть в диапазоне от 1 до 10'
             )
