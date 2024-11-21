@@ -7,7 +7,9 @@ MODELS_DICT = {
     'comments': Comments,
     'genre_title': TitleGenre,
     'genre': Genre,
-    'reviews': Review,
+    'review': Review,
     'title': Title,
     'user': CustomUser,
 }
+
+PATH = 'static/data/*'
