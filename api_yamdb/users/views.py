@@ -6,8 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .models import CustomUser
 from api.permissions import OnlyAdmin
+from .models import CustomUser
 from .serializers import (UserCreateSerializer,
                           UserRecieveTokenSerializer, UserSerializer)
 

@@ -1,14 +1,15 @@
 from rest_framework import filters, mixins, viewsets
+from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 
+from .filters import TitleFilter
 from api.serializers import (
     CategorySerializer, GenreSerializer, TitleSerializer,
     TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
 )
-from reviews.models import Category, Genre, Title, Review
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from .filters import TitleFilter
+from reviews.models import Category, Genre, Title, Review
 
 
 class CategoryViewSet(
