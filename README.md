@@ -124,6 +124,7 @@ POST .../api/v1/titles/30/reviews/10/comments/
 1. Разместить csv-файлы в каталог "api_yamdb\static\data\" или изменить путь "PATH" к каталогу в файле "api_yamdb\reviews\constants.py"
 2. Перейти в каталог с файлом "manager.py"
 3. Запустить скрипт командой:
+4. После загрузки выведется сообщение "Загрузка завершена!"
 
 ```
 python manage.py csv_loader
