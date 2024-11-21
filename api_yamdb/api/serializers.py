@@ -47,7 +47,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         genres = self.validated_data.get('genre')
-        if genres is None:
+        if genres is None or len(genres) == 0:
             raise serializers.ValidationError(
                 'Отсутствует обязательное поле или оно не корректно.'
             )
