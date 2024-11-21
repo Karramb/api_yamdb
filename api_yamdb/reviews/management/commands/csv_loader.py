@@ -40,24 +40,24 @@ class Command(BaseCommand):
                 csv_reader = csv.DictReader(file)
                 model = None
 
-                try:
-                    for el in MODELS_DICT:
-                        if el in filename:
-                            model = MODELS_DICT[el]
-                            break
+                for el in MODELS_DICT:
+                    if el in filename:
+                        model = MODELS_DICT[el]
+                        break
 
-                    if model:
+                if model:
+                    try:
                         for row in csv_reader:
                             row = self.change_title(row)
                             model.objects.get_or_create(**row)
-                    else:
-                        print(f'Не найдена модель для {filename}!')
-                except Http404:
-                    files.append(filename)
-                except IntegrityError as e:
-                    if 'FOREIGN KEY constraint failed' in str(e):
+                    except Http404:
                         files.append(filename)
-                    else:
-                        print(f'Невозможно загрузить данные '
-                              f'из файла {filename}, '
-                              f'ошибка: {e}')
+                    except IntegrityError as e:
+                        if 'FOREIGN KEY constraint failed' in str(e):
+                            files.append(filename)
+                        else:
+                            print(f'Невозможно загрузить данные '
+                                  f'из файла {filename}, '
+                                  f'ошибка: {e}')
+                else:
+                    print(f'Не найдена модель для {filename}!')
