@@ -18,7 +18,7 @@ class TitleForm(forms.ModelForm):
             if year > dt.datetime.now().year:
                 raise ValidationError(
                     'Год выпуска не может быть больше текущего.'
-            )
+                )
 
 
 class ReviewForm(forms.ModelForm):
@@ -39,4 +39,4 @@ class ReviewForm(forms.ModelForm):
             if value < 1 or value > 10:
                 raise ValidationError(
                     'Оценка должна быть в диапазоне от 1 до 10'
-            )
+                )
