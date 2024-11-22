@@ -1,5 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.models import UserManager
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
@@ -16,15 +15,15 @@ class UserRoles(Enum):
         return tuple((attribute.name, attribute.value) for attribute in cls)
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractUser):
     username = models.CharField(
         max_length=150,
         unique=True,
         validators=[RegexValidator(
             regex=r'^[\w.@+-]+$',
-            message='Ник содержит недопустимые символы'
+            message='Имя содержит недопустимые символы'
         )],
-        verbose_name='Ник пользователя',
+        verbose_name='Имя пользователя',
     )
     email = models.EmailField(
         max_length=254,
@@ -41,26 +40,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         choices=UserRoles.choices(),
         default=UserRoles.user.name,
         verbose_name='Роль'
+
     )
-    first_name = models.CharField(
-        max_length=150,
-        verbose_name='Имя',
-        blank=True
-    )
-    last_name = models.CharField(
-        max_length=150,
-        verbose_name='Фамилия',
-        blank=True
-    )
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(auto_now_add=True)
-    objects = UserManager()
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
 
     class Meta:
-        ordering = ('username',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
