@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Review, Title, TitleGenre, Genre, Category, Comments
+from .models import Review, Title, Genre, Category, Comments
+# from .models import Review, Title, TitleGenre, Genre, Category, Comments
 from .forms import TitleForm, ReviewForm
 
 
@@ -19,10 +20,10 @@ class GenreAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-class TitleGenreInline(admin.TabularInline):
-    model = TitleGenre
-    min_num = 1
-    extra = 1
+# class TitleGenreInline(admin.TabularInline):
+#     model = TitleGenre
+#     min_num = 1
+#     extra = 1
 
 
 class TitleAdmin(admin.ModelAdmin):
@@ -32,7 +33,7 @@ class TitleAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('category',)
     list_display_links = ('name',)
-    inlines = (TitleGenreInline,)
+    # inlines = (TitleGenreInline,)
 
     def get_genre(self, obj):
         return ", ".join([genre.name for genre in obj.genre.all()])
