@@ -1,5 +1,4 @@
 from rest_framework import serializers
-import datetime as dt
 
 from reviews.models import Category, Genre, Title, Review, Comments
 
@@ -75,14 +74,15 @@ class ReviewSerlizer(serializers.ModelSerializer):
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
-    def create(self, validated_data):
+    def validate(self, validated_data):
         author = self.context['request'].user
         title = self.context['view'].kwargs['title_id']
-        if Review.objects.filter(title=title, author=author).exists():
+        if (Review.objects.filter(title=title, author=author).exists()
+                and self.context['request'].method == 'POST'):
             raise serializers.ValidationError(
                 'Один пользвователь - один отзыв'
             )
-        return Review.objects.create(**validated_data)
+        return super().validate(validated_data)
 
 
 class CommentSerlizer(serializers.ModelSerializer):
