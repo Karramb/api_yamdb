@@ -85,23 +85,17 @@ class ReviewSerlizer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
-    def validate_score(self, value):
-        if value < 1 or value > 10:
-            raise serializers.ValidationError(
-                'Оценка должна быть в диапазоне от 1 до 10'
-            )
-        return value
-
-    def create(self, validated_data):
+    def validate(self, validated_data):
         author = self.context['request'].user
         title = self.context['view'].kwargs['title_id']
-        if Review.objects.filter(title=title, author=author).exists():
+        if (Review.objects.filter(title=title, author=author).exists()
+                and self.context['request'].method == 'POST'):
             raise serializers.ValidationError(
                 'Один пользвователь - один отзыв'
             )
-        return Review.objects.create(**validated_data)
+        return super().validate(validated_data)
 
 
 class CommentSerlizer(serializers.ModelSerializer):
@@ -111,5 +105,5 @@ class CommentSerlizer(serializers.ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date')
         read_only_fields = ('review',)

@@ -52,12 +52,12 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Title.objects.annotate(
-            rating=models.Avg('reviews__score')).order_by('id')
+            rating=models.Avg('reviews__score')).order_by('name')
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerlizer
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsOwnerOrReadOnly,)
 
     def get_title(self):
@@ -70,17 +70,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        title = self.get_title()
-        return title.reviews.all()
+        return self.get_title().reviews.all()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerlizer
     permission_classes = (IsOwnerOrReadOnly,)
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_review(self):
-        return get_object_or_404(Review, pk=self.kwargs['review_id'])
+        return get_object_or_404(
+            Review, pk=self.kwargs['review_id'], title=self.kwargs['title_id']
+        )
 
     def perform_create(self, serializer):
         serializer.save(
@@ -89,5 +90,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        review = self.get_review()
-        return review.comments.all()
+        return self.get_review().comments.all()

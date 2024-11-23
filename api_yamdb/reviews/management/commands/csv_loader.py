@@ -7,9 +7,21 @@ from django.http.response import Http404
 from django.core.management.base import BaseCommand
 from django.shortcuts import get_object_or_404
 
-from reviews.models import Category
+from reviews.models import (Category, Comments, Genre, TitleGenre,
+                            Review, Title)
 from users.models import CustomUser
-from reviews.constants import MODELS_DICT, PATH
+from reviews.constants import PATH
+
+
+MODELS_DICT = {
+    'category': Category,
+    'comments': Comments,
+    'genre_title': TitleGenre,
+    'genre': Genre,
+    'review': Review,
+    'title': Title,
+    'user': CustomUser,
+}
 
 
 class Command(BaseCommand):
@@ -27,39 +39,43 @@ class Command(BaseCommand):
         return row
 
     def load_file(self, path):
+        path += '*.csv'
         files = []
         for filename in glob.glob(os.path.join(path)):
             files.append(filename)
 
         return files
 
+    def get_model(self, filename):
+        for file in MODELS_DICT:
+            if file in filename:
+                return MODELS_DICT[file]
+
     def handle(self, *args, **kwargs):
         files = self.load_file(PATH)
+
         for filename in files:
-            with open(filename, 'r', encoding="utf-8") as file:
-                csv_reader = csv.DictReader(file)
-                model = None
+            try:
+                with open(filename, 'r', encoding='utf-8') as file:
+                    csv_reader = csv.DictReader(file)
 
-                for el in MODELS_DICT:
-                    if el in filename:
-                        model = MODELS_DICT[el]
-                        break
+                    model = self.get_model(filename)
+                    data = []
 
-                if model:
                     try:
-                        for row in csv_reader:
-                            row = self.change_title(row)
-                            model.objects.get_or_create(**row)
+                        if model:
+                            for row in csv_reader:
+                                row = self.change_title(row)
+                                data.append(model(**row))
+                        else:
+                            self.stdout.write(
+                                f'Не найдена модель для {filename}!')
+
+                        model.objects.bulk_create(data, ignore_conflicts=True)
                     except Http404:
                         files.append(filename)
-                    except IntegrityError as e:
-                        if 'FOREIGN KEY constraint failed' in str(e):
-                            files.append(filename)
-                        else:
-                            print(f'Невозможно загрузить данные '
-                                  f'из файла {filename}, '
-                                  f'ошибка: {e}')
-                else:
-                    print(f'Не найдена модель для {filename}!')
-
-        print('Загрузка завершена!')
+                    except IntegrityError:
+                        files.append(filename)
+                self.stdout.write('Загрузка завершена!')
+            except FileNotFoundError:
+                self.stdout.write('Файл не найден!')
