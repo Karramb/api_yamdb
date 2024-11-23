@@ -1,7 +1,6 @@
 from rest_framework import serializers
-import datetime as dt
 
-from reviews.models import Category, Genre, Title, TitleGenre, Review, Comments
+from reviews.models import Category, Genre, Title, Review, Comments
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,7 +24,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
@@ -36,14 +35,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
-
-    def validate_year(self, value):
-        if value > dt.datetime.now().year:
-            raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего.'
-            )
-        return value
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
 
     def create(self, validated_data):
         genres = self.validated_data.get('genre')
@@ -58,11 +50,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
                     f'Объект с slug={genre} не существует.'
                 )
         title = Title.objects.create(**validated_data)
-        TitleGenre.objects.bulk_create(
-            TitleGenre(
-                title=title, genre=Genre.objects.get(slug=genre)
-            ) for genre in genres
-        )
         return title
 
     def to_representation(self, instance):
@@ -85,23 +72,17 @@ class ReviewSerlizer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
-    def validate_score(self, value):
-        if value < 1 or value > 10:
-            raise serializers.ValidationError(
-                'Оценка должна быть в диапазоне от 1 до 10'
-            )
-        return value
-
-    def create(self, validated_data):
+    def validate(self, validated_data):
         author = self.context['request'].user
         title = self.context['view'].kwargs['title_id']
-        if Review.objects.filter(title=title, author=author).exists():
+        if (Review.objects.filter(title=title, author=author).exists()
+                and self.context['request'].method == 'POST'):
             raise serializers.ValidationError(
                 'Один пользвователь - один отзыв'
             )
-        return Review.objects.create(**validated_data)
+        return super().validate(validated_data)
 
 
 class CommentSerlizer(serializers.ModelSerializer):
@@ -111,5 +92,5 @@ class CommentSerlizer(serializers.ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date')
         read_only_fields = ('review',)
