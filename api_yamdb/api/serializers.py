@@ -28,13 +28,14 @@ class TitleSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
 
-            
+        
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all()
     )
-    # Неверный тип сериализатора ПАЧКА
-    genre = serializers.ListField(write_only=True)
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True
+    )
 
     class Meta:
         model = Title
@@ -54,7 +55,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         genres = validated_data.pop('genre')
         title = Title.objects.create(**validated_data)
         for genre in genres:
-            title.genre.add(Genre.objects.get(slug=genre))
+            title.genre.add(Genre.objects.get(name=genre))
         return title
 
     def to_representation(self, instance):
