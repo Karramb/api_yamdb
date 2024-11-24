@@ -19,7 +19,6 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 class TitleAdmin(admin.ModelAdmin):
-    # form = TitleForm
     list_display = ('name', 'year', 'description', 'category', 'get_genre')
     list_editable = ('category',)
     search_fields = ('name',)

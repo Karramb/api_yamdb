@@ -1,8 +1,13 @@
 PATH = 'static/data/'
 
-MAX_LEN_TXT = 256
+URL_PREFIX = (r'titles/(?P<title_id>\d+)/reviews', 'v1/auth')
 
-LOOK_TXT = 10
+MAX_LEN_TXT = 256
 
 MAX_LEN_SLUG = 50
 
+LOOK_TXT = 10
+
+MIN_SCORE = 1
+
+MAX_SCORE = 10
