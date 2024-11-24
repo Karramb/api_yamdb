@@ -7,8 +7,6 @@ from reviews.constants import URL_PREFIX
 from users.views import UserCreateViewSet, UserReceiveTokenViewSet, UserViewSet
 
 
-# URL_PREFIX = (r'titles/(?P<title_id>\d+)/reviews', 'v1/auth')
-
 signup = UserCreateViewSet.as_view({'post': 'create'})
 token = UserReceiveTokenViewSet.as_view({'post': 'create'})
 
