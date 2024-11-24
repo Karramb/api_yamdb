@@ -20,50 +20,46 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False)
     genre = GenreSerializer(many=True)
-    rating = serializers.IntegerField()
+    rating = serializers.IntegerField(default=0)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+        )
 
-
+        
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all()
     )
-    genre = serializers.ListField(write_only=True)
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True
+    )
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
 
-    def create(self, validated_data):
-        genres = self.validated_data.get('genre')
-        if genres is None or len(genres) == 0:
-            raise serializers.ValidationError(
-                'Отсутствует обязательное поле или оно не корректно.'
-            )
-        genres = validated_data.pop('genre')
-        for genre in genres:
-            if not Genre.objects.filter(slug=genre).exists():
+    def validate(self, validated_data):
+        genres = validated_data.get('genre')
+        if self.context['request'].method == 'POST' and (
+            genres is None or len(genres) == 0
+        ):
                 raise serializers.ValidationError(
-                    f'Объект с slug={genre} не существует.'
+                    'Отсутствует обязательное поле или оно не корректно.'
                 )
+        return super().validate(validated_data)
+  
+    def create(self, validated_data):
+        genres = validated_data.pop('genre')
         title = Title.objects.create(**validated_data)
+        for genre in genres:
+            title.genre.add(Genre.objects.get(name=genre))
         return title
 
     def to_representation(self, instance):
-        answer = super().to_representation(instance)
-        if (self.context['request'].method == 'POST'
-                or self.context['request'].method == 'PATCH'):
-            answer['category'] = CategorySerializer(
-                instance.category, many=False
-            ).data
-            answer['genre'] = CategorySerializer(
-                instance.genre, many=True
-            ).data
-        return answer
-
+        return TitleSerializer(self).to_representation(instance)
 
 class ReviewSerlizer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(

@@ -5,11 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 
 from users.models import CustomUser
-
-# Вынести в файл
-MAX_LEN_TXT = 256
-LOOK_TXT = 10
-MAX_LEN_SLUG = 50
+from reviews.constants import LOOK_TXT, MAX_LEN_SLUG, MAX_LEN_TXT
 
 def validate_year(value):
     if value > dt.datetime.now().year:
@@ -80,7 +76,7 @@ class CommentReviewBaseModel(models.Model):
 class Review(CommentReviewBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
-        blank=True, verbose_name='Произведение')
+        verbose_name='Произведение')
     score = models.PositiveSmallIntegerField(
         'Оценка', validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
