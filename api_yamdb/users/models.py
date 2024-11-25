@@ -1,47 +1,45 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
 from django.db import models
 
-from enum import Enum
-
-
-class UserRoles(Enum):
-    user = 'user'
-    moderator = 'moderator'
-    admin = 'admin'
-
-    @classmethod
-    def choices(cls):
-        return tuple((attribute.name, attribute.value) for attribute in cls)
+from users.constants import EMAIL_MAX_LENGTH, MAX_LENGTH_FOR_FIELDS
+from users.validators import username_validate
 
 
 class CustomUser(AbstractUser):
+    class UserRoles(models.TextChoices):
+        USER = 'user'
+        MODERATOR = 'moderator'
+        ADMIN = 'admin'
+
     username = models.CharField(
-        max_length=150,
+        max_length=MAX_LENGTH_FOR_FIELDS,
         unique=True,
-        validators=[RegexValidator(
-            regex=r'^[\w.@+-]+$',
-            message='Имя содержит недопустимые символы'
-        )],
+        validators=[username_validate],
         verbose_name='Имя пользователя',
     )
     email = models.EmailField(
-        max_length=254,
+        max_length=EMAIL_MAX_LENGTH,
         verbose_name='email',
         unique=True
     )
     bio = models.TextField(
-        max_length=500,
         blank=True,
         verbose_name='Биография'
     )
     role = models.CharField(
-        max_length=16,
-        choices=UserRoles.choices(),
-        default=UserRoles.user.name,
+        max_length=max([len(choice[0]) for choice in UserRoles.choices]),
+        choices=UserRoles.choices,
+        default=UserRoles.USER,
         verbose_name='Роль'
-
     )
+    first_name = models.CharField(
+        max_length=MAX_LENGTH_FOR_FIELDS,
+        blank=True,
+        verbose_name='Имя')
+    last_name = models.CharField(
+        max_length=MAX_LENGTH_FOR_FIELDS,
+        blank=True,
+        verbose_name='Фамилия')
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -49,3 +47,13 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def is_admin(self):
+        return (self.role == self.UserRoles.ADMIN
+                or self.is_staff
+                or self.is_superuser)
+
+    @property
+    def is_moderator(self):
+        return self.role == self.UserRoles.MODERATOR
