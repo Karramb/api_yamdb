@@ -37,7 +37,7 @@ class TitleSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
 
-        
+  
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all()
@@ -55,11 +55,11 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         if self.context['request'].method == 'POST' and (
             genres is None or len(genres) == 0
         ):
-                raise serializers.ValidationError(
-                    'Отсутствует обязательное поле или оно не корректно.'
-                )
+            raise serializers.ValidationError(
+                'Отсутствует обязательное поле или оно не корректно.'
+            )
         return super().validate(validated_data)
-  
+
     def create(self, validated_data):
         genres = validated_data.pop('genre')
         title = Title.objects.create(**validated_data)
@@ -69,6 +69,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return TitleSerializer(self).to_representation(instance)
+
 
 class ReviewSerlizer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
@@ -117,7 +118,7 @@ class UserCreateSerializer(serializers.Serializer):
             email=data.get('email')) or YaMDBUser.objects.filter(
                 username=data.get('username')):
             if YaMDBUser.objects.filter(email=data.get('email'),
-                                         username=data.get('username')):
+                                        username=data.get('username')):
                 pass
             else:
                 raise serializers.ValidationError(

@@ -2,7 +2,6 @@ import datetime as dt
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.utils.translation import gettext_lazy as _
 
 from reviews.abstracts import BaseModel, CommentReviewBaseModel
 from reviews.constants import LOOK_TXT, MAX_LEN_TXT, MAX_SCORE, MIN_SCORE
