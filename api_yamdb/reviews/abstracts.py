@@ -1,7 +1,7 @@
 from django.db import models
 
 from reviews.constants import MAX_LEN_SLUG, MAX_LEN_TXT
-from users.models import CustomUser
+from users.models import YaMDBUser
 
 
 class BaseModel(models.Model):
@@ -9,7 +9,7 @@ class BaseModel(models.Model):
     slug = models.SlugField('Слаг', max_length=MAX_LEN_SLUG, unique=True)
 
     class Meta:
-        abstract=True
+        abstract = True
         ordering = ('name',)
 
     def __str__(self):
@@ -17,13 +17,16 @@ class BaseModel(models.Model):
 
 
 class CommentReviewBaseModel(models.Model):
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True) 
-    text = models.TextField('Текст') 
-    author = models.ForeignKey( 
-        CustomUser, on_delete=models.CASCADE, 
-        verbose_name='Автор' 
-    ) 
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    text = models.TextField('Текст')
+    author = models.ForeignKey(
+        YaMDBUser, on_delete=models.CASCADE,
+        verbose_name='Автор'
+    )
 
     class Meta:
-        abstract=True
+        abstract = True
         ordering = ('-pub_date',)
+
+    def __str__(self):
+        return self.text

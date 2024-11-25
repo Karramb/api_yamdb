@@ -4,7 +4,7 @@ from rest_framework import routers
 from api.views import (CategoryViewSet, GenreViewSet, TitleViewSet,
                        ReviewViewSet, CommentViewSet)
 from reviews.constants import URL_PREFIX
-from users.views import UserCreateViewSet, UserReceiveTokenViewSet, UserViewSet
+from api.views import UserCreateViewSet, UserReceiveTokenViewSet, UserViewSet
 
 
 signup = UserCreateViewSet.as_view()

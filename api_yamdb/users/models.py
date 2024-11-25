@@ -1,11 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from users.constants import EMAIL_MAX_LENGTH, MAX_LENGTH_FOR_FIELDS
+from .constants import EMAIL_MAX_LENGTH, MAX_LENGTH_FOR_FIELDS
 from users.validators import username_validate
 
 
-class CustomUser(AbstractUser):
+class YaMDBUser(AbstractUser):
     class UserRoles(models.TextChoices):
         USER = 'user'
         MODERATOR = 'moderator'
@@ -44,6 +44,7 @@ class CustomUser(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
 
     def __str__(self):
         return self.username

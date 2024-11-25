@@ -45,6 +45,7 @@ class Title(models.Model):
         ordering = ('name', 'year')
         verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -55,7 +56,8 @@ class Review(CommentReviewBaseModel):
         Title, on_delete=models.CASCADE,
         verbose_name='Произведение')
     score = models.PositiveSmallIntegerField(
-        'Оценка', validators=[MinValueValidator(MIN_SCORE), MaxValueValidator(MAX_SCORE)]
+        'Оценка', validators=[MinValueValidator(MIN_SCORE),
+                              MaxValueValidator(MAX_SCORE)]
     )
 
     class Meta(CommentReviewBaseModel.Meta):
@@ -68,6 +70,7 @@ class Review(CommentReviewBaseModel):
                 name='unique_author',
             ),
         )
+        ordering = ('title',)
 
     def __str__(self):
         return f'{self.title.name}, {self.score}'
@@ -85,6 +88,7 @@ class Comments(CommentReviewBaseModel):
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
         default_related_name = 'comments'
+        ordering = ('text',)
 
     def __str__(self):
         return self.text[:LOOK_TXT]

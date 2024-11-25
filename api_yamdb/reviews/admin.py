@@ -30,6 +30,7 @@ class TitleAdmin(admin.ModelAdmin):
     def get_genre(self, obj):
         return ', '.join([genre.name for genre in obj.genre.all()])
 
+
 admin.site.register(Title, TitleAdmin)
 
 

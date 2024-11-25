@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
 ]
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.YaMDBUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -37,6 +37,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'api_yamdb.urls'
+
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
