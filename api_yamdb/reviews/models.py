@@ -4,12 +4,9 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 
-from users.models import CustomUser
+from reviews.abstracts import BaseModel, CommentReviewBaseModel
+from reviews.constants import LOOK_TXT, MAX_LEN_TXT, MAX_SCORE, MIN_SCORE
 
-# Вынести в файл
-MAX_LEN_TXT = 256
-LOOK_TXT = 10
-MAX_LEN_SLUG = 50
 
 def validate_year(value):
     if value > dt.datetime.now().year:
@@ -17,17 +14,6 @@ def validate_year(value):
             'Год выпуска не может быть больше текущего.'
         )
 
-
-class BaseModel(models.Model):
-    name = models.CharField('Название', max_length=MAX_LEN_TXT)
-    slug = models.SlugField('Слаг', max_length=MAX_LEN_SLUG, unique=True)
-
-    class Meta:
-        abstract=True
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
 
 class Category(BaseModel):
 
@@ -59,30 +45,19 @@ class Title(models.Model):
         ordering = ('name', 'year')
         verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
 
 
-class CommentReviewBaseModel(models.Model):
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True) 
-    text = models.TextField('Текст') 
-    author = models.ForeignKey( 
-        CustomUser, on_delete=models.CASCADE, 
-        verbose_name='Автор' 
-    ) 
-
-    class Meta:
-        abstract=True
-        ordering = ('-pub_date',)
-    
-
 class Review(CommentReviewBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
-        blank=True, verbose_name='Произведение')
+        verbose_name='Произведение')
     score = models.PositiveSmallIntegerField(
-        'Оценка', validators=[MinValueValidator(1), MaxValueValidator(10)]
+        'Оценка', validators=[MinValueValidator(MIN_SCORE),
+                              MaxValueValidator(MAX_SCORE)]
     )
 
     class Meta(CommentReviewBaseModel.Meta):
@@ -95,6 +70,7 @@ class Review(CommentReviewBaseModel):
                 name='unique_author',
             ),
         )
+        ordering = ('title',)
 
     def __str__(self):
         return f'{self.title.name}, {self.score}'
@@ -112,6 +88,7 @@ class Comments(CommentReviewBaseModel):
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
         default_related_name = 'comments'
+        ordering = ('text',)
 
     def __str__(self):
         return self.text[:LOOK_TXT]

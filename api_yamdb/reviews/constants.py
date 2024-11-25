@@ -1,15 +1,13 @@
-from reviews.models import (Category, Comments, Genre, TitleGenre,
-                            Review, Title)
-from users.models import CustomUser
+PATH = 'static/data/'
 
-MODELS_DICT = {
-    'category': Category,
-    'comments': Comments,
-    'genre_title': TitleGenre,
-    'genre': Genre,
-    'review': Review,
-    'title': Title,
-    'user': CustomUser,
-}
+URL_PREFIX = (r'titles/(?P<title_id>\d+)/reviews', 'v1/auth')
 
-PATH = 'static/data/*'
+MAX_LEN_TXT = 256
+
+MAX_LEN_SLUG = 50
+
+LOOK_TXT = 10
+
+MIN_SCORE = 1
+
+MAX_SCORE = 10
