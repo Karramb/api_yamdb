@@ -8,8 +8,8 @@ from django.core.management.base import BaseCommand
 from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Comments, Genre, Review, Title
-from users.models import CustomUser
-from reviews.constants import PATH
+from users.models import YaMDBUser
+from api_yamdb.settings import PATH_FOR_CSV
 
 
 MODELS_DICT = {
@@ -19,7 +19,7 @@ MODELS_DICT = {
     'genre': Genre,
     'review': Review,
     'title': Title,
-    'user': CustomUser,
+    'user': YaMDBUser,
 }
 
 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
     def change_title(self, row):
         if 'author' in row:
             row['author'] = get_object_or_404(
-                CustomUser, pk=row['author']
+                YaMDBUser, pk=row['author']
             )
         elif 'category' in row:
             row['category'] = get_object_or_404(
@@ -51,7 +51,7 @@ class Command(BaseCommand):
                 return MODELS_DICT[file]
 
     def handle(self, *args, **kwargs):
-        files = self.load_file(PATH)
+        files = self.load_file(PATH_FOR_CSV)
 
         for filename in files:
             try:

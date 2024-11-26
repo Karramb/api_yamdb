@@ -16,7 +16,7 @@ class BaseModel(models.Model):
         return self.name
 
 
-class CommentReviewBaseModel(models.Model):
+class ObjectBaseModel(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     text = models.TextField('Текст')
     author = models.ForeignKey(
@@ -27,6 +27,3 @@ class CommentReviewBaseModel(models.Model):
     class Meta:
         abstract = True
         ordering = ('-pub_date',)
-
-    def __str__(self):
-        return self.text
