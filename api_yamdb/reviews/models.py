@@ -1,11 +1,11 @@
 import datetime as dt
+
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.utils.translation import gettext_lazy as _
 
-from reviews.abstracts import BaseModel, CommentReviewBaseModel
-from reviews.constants import LOOK_TXT, MAX_LEN_TXT, MAX_SCORE, MIN_SCORE
+from reviews.abstracts import BaseModel, ObjectBaseModel
+from reviews.constants import LOOK_TEXT, MAX_LEN_TXT, MAX_SCORE, MIN_SCORE
 
 
 def validate_year(value):
@@ -51,7 +51,7 @@ class Title(models.Model):
         return self.name
 
 
-class Review(CommentReviewBaseModel):
+class Review(ObjectBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         verbose_name='Произведение')
@@ -60,7 +60,7 @@ class Review(CommentReviewBaseModel):
                               MaxValueValidator(MAX_SCORE)]
     )
 
-    class Meta(CommentReviewBaseModel.Meta):
+    class Meta(ObjectBaseModel.Meta):
         verbose_name = 'отзыв'
         verbose_name_plural = 'Отзывы'
         default_related_name = 'reviews'
@@ -73,10 +73,10 @@ class Review(CommentReviewBaseModel):
         ordering = ('title',)
 
     def __str__(self):
-        return f'{self.title.name}, {self.score}'
+        return f'{self.title}, {self.score}'
 
 
-class Comments(CommentReviewBaseModel):
+class Comments(ObjectBaseModel):
     text = models.TextField('Комментарий')
     review = models.ForeignKey(
         Review,
@@ -84,11 +84,11 @@ class Comments(CommentReviewBaseModel):
         verbose_name='Отзыв'
     )
 
-    class Meta(CommentReviewBaseModel.Meta):
+    class Meta(ObjectBaseModel.Meta):
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
         default_related_name = 'comments'
         ordering = ('text',)
 
     def __str__(self):
-        return self.text[:LOOK_TXT]
+        return self.text[:LOOK_TEXT]
