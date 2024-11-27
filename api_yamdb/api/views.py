@@ -2,11 +2,12 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Q
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
     filters, mixins, permissions, serializers, status, viewsets
 )
+
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,9 +16,10 @@ from rest_framework_simplejwt.tokens import AccessToken
 from api.filters import TitleFilter
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly, OnlyAdmin
 from api.serializers import (
-    CategorySerializer, GenreSerializer, TitleSerializer,
-    TitleCreateSerializer, ReviewSerlizer, CommentSerlizer,
+    CategorySerializer, GenreSerializer, TitleReadSerializer,
+    TitleNotReadSerializer, ReviewSerlizer, CommentSerlizer,
     SignupSerializer, UserRecieveTokenSerializer, UserSerializer
+
 )
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Title, Review
@@ -46,7 +48,9 @@ class GenreViewSet(OptionsViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    serializer_class = TitleSerializer
+    queryset = Title.objects.annotate(
+        rating=models.Avg('reviews__score')).order_by(*Title._meta.ordering)
+    serializer_class = TitleReadSerializer
     http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -54,14 +58,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
-            return TitleSerializer
-        else:
-            return TitleCreateSerializer
-
-    def get_queryset(self):
-        return Title.objects.annotate(
-            rating=models.Avg('reviews__score')
-        ).order_by('name')
+            return TitleReadSerializer
+        return TitleNotReadSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

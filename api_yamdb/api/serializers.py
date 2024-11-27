@@ -24,7 +24,7 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class TitleReadSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False)
     genre = GenreSerializer(many=True)
     rating = serializers.IntegerField(default=0)
@@ -34,39 +34,26 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
+        read_only_fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+        )
 
 
-class TitleCreateSerializer(serializers.ModelSerializer):
+class TitleNotReadSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all()
     )
     genre = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Genre.objects.all(), many=True
+        slug_field='slug', queryset=Genre.objects.all(), many=True,
+        allow_empty=False,
     )
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
 
-    def validate(self, validated_data):
-        genres = validated_data.get('genre')
-        if self.context['request'].method == 'POST' and (
-            genres is None or len(genres) == 0
-        ):
-            raise serializers.ValidationError(
-                'Отсутствует обязательное поле или оно не корректно.'
-            )
-        return super().validate(validated_data)
-
-    def create(self, validated_data):
-        genres = validated_data.pop('genre')
-        title = Title.objects.create(**validated_data)
-        for genre in genres:
-            title.genre.add(Genre.objects.get(name=genre))
-        return title
-
     def to_representation(self, instance):
-        return TitleSerializer(self).to_representation(instance)
+        return TitleReadSerializer(self).to_representation(instance)
 
 
 class ReviewSerlizer(serializers.ModelSerializer):
