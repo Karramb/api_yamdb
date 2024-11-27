@@ -4,7 +4,7 @@ from reviews.constants import MAX_LEN_SLUG, MAX_LEN_TXT
 from users.models import YaMDBUser
 
 
-class BaseModel(models.Model):
+class NameSlugModel(models.Model):
     name = models.CharField('Название', max_length=MAX_LEN_TXT)
     slug = models.SlugField('Слаг', max_length=MAX_LEN_SLUG, unique=True)
 
@@ -21,7 +21,7 @@ class ObjectBaseModel(models.Model):
     text = models.TextField('Текст')
     author = models.ForeignKey(
         YaMDBUser, on_delete=models.CASCADE,
-        verbose_name='Автор'
+        verbose_name='Автор', related_name='%(class)s_objectbase'
     )
 
     class Meta:

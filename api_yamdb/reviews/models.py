@@ -4,27 +4,29 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from reviews.abstracts import BaseModel, ObjectBaseModel
+from reviews.abstracts import NameSlugModel, ObjectBaseModel
 from reviews.constants import LOOK_TEXT, MAX_LEN_TXT, MAX_SCORE, MIN_SCORE
 
 
 def validate_year(value):
-    if value > dt.datetime.now().year:
+    now_year = dt.datetime.now().year
+    if value > now_year:
         raise ValidationError(
-            'Год выпуска не может быть больше текущего.'
+            f'Год выпуска {value} не может быть больше текущего {now_year}.'
         )
+    return value
 
 
-class Category(BaseModel):
+class Category(NameSlugModel):
 
-    class Meta(BaseModel.Meta):
+    class Meta(NameSlugModel.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
 
-class Genre(BaseModel):
+class Genre(NameSlugModel):
 
-    class Meta(BaseModel.Meta):
+    class Meta(NameSlugModel.Meta):
         verbose_name = 'жанр'
         verbose_name_plural = 'Жанры'
 
@@ -33,19 +35,17 @@ class Title(models.Model):
     name = models.CharField('Название', max_length=MAX_LEN_TXT)
     year = models.SmallIntegerField('Год', validators=[validate_year])
     description = models.TextField('Описание', blank=True, null=True)
-    genre = models.ManyToManyField(
-        Genre, verbose_name='Жанр', related_name='genres'
-    )
+    genre = models.ManyToManyField(Genre, verbose_name='Жанр')
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
-        related_name='categories', null=True, verbose_name='Категория'
+        null=True, verbose_name='Категория'
     )
 
     class Meta:
         ordering = ('name', 'year')
         verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
-        ordering = ('name',)
+        default_related_name = 'titles'
 
     def __str__(self):
         return self.name
