@@ -51,14 +51,14 @@ python3 manage.py migrate
 ```
 
 #### Загрузить данные из csv-файлов:
-Разместите csv-файлы в каталоге "api_yamdb\static\data\" или измените путь "PATH" к каталогу в файле "api_yamdb\reviews\constants.py"
+Разместите csv-файлы в каталоге "api_yamdb\static\data\" или измените путь "PATH" к каталогу в файле "api_yamdb\api_yamdb\settings.py"
 
 В каталоге с файлом "manage.py" запустить скрипт командой:
 
 ```
 python manage.py csv_loader
 ```
-После загрузки выведется сообщение "Загрузка завершена!"
+После загрузки выведется сообщение: "Загрузка завершена!"
 
 Запустить проект:
 
