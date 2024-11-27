@@ -20,7 +20,7 @@ from api.serializers import (
 )
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Title, Review
-from api.serializers import (UserCreateSerializer,
+from api.serializers import (SignupSerializer,
                              UserRecieveTokenSerializer, UserSerializer)
 from users.constants import ME
 from users.models import YaMDBUser
@@ -105,7 +105,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class UserCreateViewSet(mixins.CreateModelMixin,
                         viewsets.GenericViewSet):
     queryset = YaMDBUser.objects.all()
-    serializer_class = UserCreateSerializer()
+    serializer_class = SignupSerializer()
     permission_classes = (permissions.AllowAny,)
 
     def create(self, request):
@@ -119,7 +119,7 @@ class UserCreateViewSet(mixins.CreateModelMixin,
             else:
                 raise serializers.ValidationError(
                     'Пользователь с такими данными уже есть в системе')
-        serializer = UserCreateSerializer(data=request.data)
+        serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, _ = YaMDBUser.objects.get_or_create(
             **serializer.validated_data

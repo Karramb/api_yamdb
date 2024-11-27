@@ -100,7 +100,7 @@ class CommentSerlizer(serializers.ModelSerializer):
         read_only_fields = ('review',)
 
 
-class UserCreateSerializer(serializers.Serializer):
+class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=MAX_LENGTH_FOR_FIELDS,
         validators=[username_validate],
