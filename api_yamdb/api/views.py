@@ -4,24 +4,25 @@ from django.db import models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (filters, generics, mixins,
-                            permissions, serializers, status, viewsets)
+from rest_framework import (
+    filters, mixins, permissions, serializers, status, viewsets
+)
+
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.views import APIView
 
 from api.filters import TitleFilter
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly, OnlyAdmin
 from api.serializers import (
     CategorySerializer, GenreSerializer, TitleReadSerializer,
-    TitleNotReadSerializer, ReviewSerlizer, CommentSerlizer
+    TitleNotReadSerializer, ReviewSerlizer, CommentSerlizer,
+    SignupSerializer, UserRecieveTokenSerializer, UserSerializer
+
 )
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Title, Review
-from api.serializers import (SignupSerializer,
-                             UserRecieveTokenSerializer, UserSerializer)
 from users.constants import ME
 from users.models import YaMDBUser
 

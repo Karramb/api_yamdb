@@ -67,11 +67,13 @@ class ReviewSerlizer(serializers.ModelSerializer):
 
     def validate(self, validated_data):
         author = self.context['request'].user
-        title = self.context['view'].kwargs['title_id']
-        if (Review.objects.filter(title=title, author=author).exists()
-                and self.context['request'].method == 'POST'):
+        title_id = self.context['view'].kwargs['title_id']
+        if (self.context['request'].method == 'POST'
+                and Review.objects.filter(
+                    title=title_id, author=author
+        ).exists()):
             raise serializers.ValidationError(
-                'Один пользвователь - один отзыв'
+                'Можно написать только один отзыв на произведение!'
             )
         return super().validate(validated_data)
 
@@ -83,7 +85,7 @@ class CommentSerlizer(serializers.ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date', 'review')
         read_only_fields = ('review',)
 
 

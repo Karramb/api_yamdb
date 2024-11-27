@@ -27,4 +27,3 @@ class ObjectBaseModel(models.Model):
     class Meta:
         abstract = True
         ordering = ('-pub_date',)
-        default_related_name = 'baseobjects'
