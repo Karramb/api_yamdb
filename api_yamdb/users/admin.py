@@ -6,6 +6,6 @@ from .models import YaMDBUser
 
 @admin.register(YaMDBUser)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'username', 'bio', 'role')
+    list_display = ('email', 'username', 'role')
     list_display_links = ('email', 'username')
-    list_editable = ('bio', 'role')
+    list_editable = ('role',)

@@ -70,7 +70,6 @@ class Review(ObjectBaseModel):
                 name='unique_author',
             ),
         )
-        ordering = ('title',)
 
     def __str__(self):
         return f'{self.title}, {self.score}'

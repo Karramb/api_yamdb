@@ -6,8 +6,8 @@ from api.views import (CategoryViewSet, GenreViewSet, TitleViewSet,
 from api.views import UserCreateViewSet, UserReceiveTokenViewSet, UserViewSet
 
 
-signup = UserCreateViewSet.as_view()
-token = UserReceiveTokenViewSet.as_view()
+signup = UserCreateViewSet.as_view({'post': 'create'})
+token = UserReceiveTokenViewSet.as_view({'post': 'create'})
 
 router_v1 = routers.DefaultRouter()
 router_v1.register('categories', CategoryViewSet, basename='categories')
