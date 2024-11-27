@@ -4,13 +4,13 @@ from django.db import models
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from rest_framework import (filters, generics, mixins,
-                            permissions, serializers, status, viewsets)
+from rest_framework import (
+    filters, mixins, permissions, serializers, status, viewsets
+)
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.views import APIView
 
 from api.filters import TitleFilter
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly, OnlyAdmin
@@ -19,9 +19,9 @@ from api.serializers import (
     TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
 )
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-from reviews.models import Category, Genre, Title, Review
 from api.serializers import (UserCreateSerializer,
                              UserRecieveTokenSerializer, UserSerializer)
+from reviews.models import Category, Genre, Title, Review
 from users.constants import ME
 from users.models import YaMDBUser
 
@@ -61,7 +61,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Title.objects.annotate(
-            rating=models.Avg('reviews__score')).order_by('name')
+            rating=models.Avg('reviews__score')
+        ).order_by('name')
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
