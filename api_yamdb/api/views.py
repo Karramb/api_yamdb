@@ -1,11 +1,15 @@
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.db import models
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework import (filters, generics, mixins,
-                            permissions, status, viewsets)
+                            permissions, serializers, status, viewsets)
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.views import APIView
 
 from api.filters import TitleFilter
@@ -14,9 +18,11 @@ from api.serializers import (
     CategorySerializer, GenreSerializer, TitleSerializer,
     TitleCreateSerializer, ReviewSerlizer, CommentSerlizer
 )
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Title, Review
 from api.serializers import (UserCreateSerializer,
                              UserRecieveTokenSerializer, UserSerializer)
+from users.constants import ME
 from users.models import YaMDBUser
 
 
@@ -96,32 +102,58 @@ class CommentViewSet(viewsets.ModelViewSet):
         return self.get_review().comments.all()
 
 
-class UserCreateViewSet(generics.CreateAPIView):
+class UserCreateViewSet(mixins.CreateModelMixin,
+                        viewsets.GenericViewSet):
     queryset = YaMDBUser.objects.all()
     serializer_class = UserCreateSerializer()
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request):
+    def create(self, request):
+        query = Q(email=request.data.get('email'))
+        query.add(Q(username=request.data.get('username')), Q.OR)
+        user = YaMDBUser.objects.filter(query).first()
+        if user:
+            if (user.email == request.data.get('email')
+                    and user.username == request.data.get('username')):
+                pass
+            else:
+                raise serializers.ValidationError(
+                    'Пользователь с такими данными уже есть в системе')
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user, _ = YaMDBUser.objects.get_or_create(
+            **serializer.validated_data
+        )
+        confirmation_code = default_token_generator.make_token(user)
+        send_mail(
+            subject='Код подтверждения',
+            message=f'Код подтверждения: {confirmation_code}',
+            from_email=DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email, ],
+            fail_silently=True,
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserReceiveTokenViewSet(APIView):
+class UserReceiveTokenViewSet(mixins.CreateModelMixin,
+                              viewsets.GenericViewSet):
     queryset = YaMDBUser.objects.all()
     serializer_class = UserRecieveTokenSerializer
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request):
+    def create(self, request):
         serializer = UserRecieveTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = get_object_or_404(
             YaMDBUser,
             username=request.data.get('username')
         )
-        token = serializer.get_token_for_user(user)
-        return Response(token, status=status.HTTP_200_OK)
+        confirmation_code = request.data.get('confirmation_code')
+        if not default_token_generator.check_token(user, confirmation_code):
+            raise serializers.ValidationError(
+                'Ошибка в коде подтверждения.')
+        message = {'token': str(AccessToken.for_user(user))}
+        return Response(message, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -135,13 +167,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False,
             methods=['get'],
-            url_path='me',
+            url_path=ME,
             permission_classes=(IsAuthenticated,))
-    def me(self, request):
+    def self_data(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @me.mapping.patch
+    @self_data.mapping.patch
     def patch_me(self, request):
         user = request.user
         serializer = UserSerializer(user, data=request.data, partial=True)

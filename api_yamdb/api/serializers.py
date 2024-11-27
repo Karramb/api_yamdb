@@ -1,13 +1,11 @@
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers, status
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework import serializers
 
 from reviews.models import Category, Genre, Title, Review, Comments
-from api_yamdb.settings import DEFAULT_FROM_EMAIL
-from users.constants import EMAIL_MAX_LENGTH, MAX_LENGTH_FOR_FIELDS
+from users.constants import (
+    CONFIRMATION_CODE_LENGTH,
+    EMAIL_MAX_LENGTH,
+    MAX_LENGTH_FOR_FIELDS
+)
 from users.models import YaMDBUser
 from users.validators import username_validate
 
@@ -105,61 +103,21 @@ class CommentSerlizer(serializers.ModelSerializer):
 class UserCreateSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=MAX_LENGTH_FOR_FIELDS,
-        validators=[username_validate]
+        validators=[username_validate],
+        required=True
     )
-    email = serializers.EmailField(max_length=EMAIL_MAX_LENGTH)
-
-    class Meta:
-        model = YaMDBUser
-        fields = ('username', 'email')
-
-    def validate(self, data):
-        if YaMDBUser.objects.filter(
-            email=data.get('email')) or YaMDBUser.objects.filter(
-                username=data.get('username')):
-            if YaMDBUser.objects.filter(email=data.get('email'),
-                                        username=data.get('username')):
-                pass
-            else:
-                raise serializers.ValidationError(
-                    'Пользователь с такими данными уже есть в системе')
-        return data
-
-    def create(self, validated_data):
-        serializer = UserCreateSerializer(data=validated_data)
-        serializer.is_valid(raise_exception=True)
-        user, _ = YaMDBUser.objects.get_or_create(
-            **serializer.validated_data
-        )
-        confirmation_code = default_token_generator.make_token(user)
-        send_mail(
-            subject='Код подтверждения',
-            message=f'Код подтверждения: {confirmation_code}',
-            from_email=DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email, ],
-            fail_silently=True,
-        )
-        return validated_data
+    email = serializers.EmailField(max_length=EMAIL_MAX_LENGTH,
+                                   required=True)
 
 
 class UserRecieveTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    confirmation_code = serializers.CharField(required=True)
-
-    def validate(self, data):
-        confirmation_code = data.get('confirmation_code')
-        user = get_object_or_404(YaMDBUser, username=data.get('username'))
-        if not default_token_generator.check_token(user, confirmation_code):
-            raise serializers.ValidationError(
-                'Ошибка в коде подтверждения.')
-        message = {'token': str(AccessToken.for_user(user))}
-        return Response(message, status=status.HTTP_200_OK)
-
-    def get_token_for_user(self, user):
-        refresh = RefreshToken.for_user(user)
-        return {
-            'token': str(refresh.access_token),
-        }
+    username = serializers.CharField(required=True,
+                                     validators=[username_validate],
+                                     max_length=MAX_LENGTH_FOR_FIELDS)
+    confirmation_code = serializers.CharField(
+        max_length=CONFIRMATION_CODE_LENGTH,
+        required=True
+    )
 
 
 class UserSerializer(serializers.ModelSerializer):

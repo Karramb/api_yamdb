@@ -1,7 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .constants import EMAIL_MAX_LENGTH, MAX_LENGTH_FOR_FIELDS
+from users.constants import (
+    EMAIL_MAX_LENGTH,
+    MAX_LENGTH_FOR_FIELDS
+)
 from users.validators import username_validate
 
 
@@ -15,7 +18,7 @@ class YaMDBUser(AbstractUser):
         max_length=MAX_LENGTH_FOR_FIELDS,
         unique=True,
         validators=[username_validate],
-        verbose_name='Имя пользователя',
+        verbose_name='Никнейм',
     )
     email = models.EmailField(
         max_length=EMAIL_MAX_LENGTH,
@@ -27,7 +30,7 @@ class YaMDBUser(AbstractUser):
         verbose_name='Биография'
     )
     role = models.CharField(
-        max_length=max([len(choice[0]) for choice in UserRoles.choices]),
+        max_length=max(len(choice) for choice, _ in UserRoles.choices),
         choices=UserRoles.choices,
         default=UserRoles.USER,
         verbose_name='Роль'
@@ -52,8 +55,7 @@ class YaMDBUser(AbstractUser):
     @property
     def is_admin(self):
         return (self.role == self.UserRoles.ADMIN
-                or self.is_staff
-                or self.is_superuser)
+                or self.is_staff)
 
     @property
     def is_moderator(self):
