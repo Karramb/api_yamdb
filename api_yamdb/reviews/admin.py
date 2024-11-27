@@ -26,9 +26,9 @@ class TitleAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     filter_horizontal = ('genre',)
 
-    @admin.display(description="Жанр(ы)")
-    def get_genre(self, obj):
-        return ', '.join([genre.name for genre in obj.genre.all()])
+    @admin.display(description='Жанр(ы)')
+    def get_genre(self, title):
+        return ', '.join(genre.name for genre in title.genre.all())
 
 
 admin.site.register(Title, TitleAdmin)

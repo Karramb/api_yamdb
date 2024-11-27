@@ -19,9 +19,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework_simplejwt',
-    'api.apps.ApiConfig',
-    'reviews.apps.ReviewsConfig',
     'users.apps.UsersConfig',
+    'reviews.apps.ReviewsConfig',
+    'api.apps.ApiConfig',
 ]
 
 AUTH_USER_MODEL = 'users.YaMDBUser'
@@ -62,7 +62,7 @@ WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(os.path.join(BASE_DIR, "db.sqlite3")),
+        'NAME': str(os.path.join(BASE_DIR, 'db.sqlite3')),
     }
 }
 
