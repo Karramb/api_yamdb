@@ -1,11 +1,11 @@
 from django.db import models
 
-from reviews.constants import MAX_LEN_SLUG, MAX_LEN_TXT
+from reviews.constants import MAX_LEN_SLUG, MAX_LEN_TEXT
 from users.models import YaMDBUser
 
 
 class NameSlugModel(models.Model):
-    name = models.CharField('Название', max_length=MAX_LEN_TXT)
+    name = models.CharField('Название', max_length=MAX_LEN_TEXT)
     slug = models.SlugField('Слаг', max_length=MAX_LEN_SLUG, unique=True)
 
     class Meta:
