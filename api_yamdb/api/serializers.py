@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comments
+from reviews.models import Category, Genre, Title, Review, Comment
 from users.constants import (
     CONFIRMATION_CODE_LENGTH,
     EMAIL_MAX_LENGTH,
@@ -82,7 +82,7 @@ class CommentSerlizer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Comments
+        model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
 
 

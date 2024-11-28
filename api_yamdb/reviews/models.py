@@ -42,7 +42,7 @@ class Title(models.Model):
     )
 
     class Meta:
-        ordering = ('-year')
+        ordering = ('-year',)
         verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
         default_related_name = 'titles'
@@ -74,7 +74,7 @@ class Review(ContentBaseModel):
         return f'{self.title}, {self.score}'
 
 
-class Comment(ObjectBaseModel):
+class Comment(ContentBaseModel):
     text = models.TextField('Текст')
     review = models.ForeignKey(
         Review,
