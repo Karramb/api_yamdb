@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from reviews.models import Review, Title, Genre, Category, Comments
+from reviews.models import Review, Title, Genre, Category, Comment
 
 
 admin.site.empty_value_display = 'Не задано'
@@ -41,7 +41,7 @@ class ReviewAdmin(admin.ModelAdmin):
     list_filter = ('score', 'pub_date', 'author')
 
 
-@admin.register(Comments)
+@admin.register(Comment)
 class CommentsAdmin(admin.ModelAdmin):
     list_display = ('text', 'review', 'pub_date', 'author')
     search_fields = ('text',)

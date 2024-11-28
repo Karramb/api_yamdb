@@ -42,7 +42,7 @@ class Title(models.Model):
     )
 
     class Meta:
-        ordering = ('name', '-year')
+        ordering = ('-year')
         verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
         default_related_name = 'titles'
@@ -63,7 +63,6 @@ class Review(ContentBaseModel):
     class Meta(ContentBaseModel.Meta):
         verbose_name = 'отзыв'
         verbose_name_plural = 'Отзывы'
-        default_related_name = 'reviews'
         constraints = (
             models.UniqueConstraint(
                 fields=['author', 'title'],
@@ -75,8 +74,8 @@ class Review(ContentBaseModel):
         return f'{self.title}, {self.score}'
 
 
-class Comments(ContentBaseModel):
-    text = models.TextField('Комментарий')
+class Comment(ObjectBaseModel):
+    text = models.TextField('Текст')
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
@@ -86,8 +85,6 @@ class Comments(ContentBaseModel):
     class Meta(ContentBaseModel.Meta):
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
-        default_related_name = 'comments'
-        ordering = ('text',)
 
     def __str__(self):
         return self.text[:LOOK_TEXT]
