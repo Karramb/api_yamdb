@@ -47,7 +47,7 @@ class GenreViewSet(OptionsViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
-        rating=models.Avg('reviews__score')).order_by(*Title._meta.ordering)
+        rating=models.Avg('reviews__score')).order_by('-rating', '-year')
     serializer_class = TitleReadSerializer
     http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (DjangoFilterBackend,)
