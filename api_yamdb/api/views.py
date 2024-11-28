@@ -17,7 +17,7 @@ from api.filters import TitleFilter
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly, OnlyAdmin
 from api.serializers import (
     CategorySerializer, GenreSerializer, TitleReadSerializer,
-    TitleNotReadSerializer, ReviewSerlizer, CommentSerlizer,
+    TitleWriteSerializer, ReviewSerlizer, CommentSerlizer,
     SignupSerializer, UserRecieveTokenSerializer, UserSerializer
 
 )
@@ -57,9 +57,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ['list', 'retrieve']:
             return TitleReadSerializer
-        return TitleNotReadSerializer
+        return TitleWriteSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

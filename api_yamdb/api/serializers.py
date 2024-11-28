@@ -34,18 +34,16 @@ class TitleReadSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
-        read_only_fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
-        )
+        read_only_fields = fields
 
 
-class TitleNotReadSerializer(serializers.ModelSerializer):
+class TitleWriteSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all()
     )
     genre = serializers.SlugRelatedField(
         slug_field='slug', queryset=Genre.objects.all(), many=True,
-        allow_empty=False,
+        allow_empty=False
     )
 
     class Meta:
@@ -53,7 +51,7 @@ class TitleNotReadSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
 
     def to_representation(self, instance):
-        return TitleReadSerializer(self).to_representation(instance)
+        return TitleReadSerializer().to_representation(instance)
 
 
 class ReviewSerlizer(serializers.ModelSerializer):
