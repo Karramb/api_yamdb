@@ -7,7 +7,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
     filters, mixins, permissions, serializers, status, viewsets
 )
-
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,7 +18,6 @@ from api.serializers import (
     CategorySerializer, GenreSerializer, TitleReadSerializer,
     TitleWriteSerializer, ReviewSerlizer, CommentSerlizer,
     SignupSerializer, UserRecieveTokenSerializer, UserSerializer
-
 )
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Title, Review
