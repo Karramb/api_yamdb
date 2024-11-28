@@ -16,7 +16,7 @@ class NameSlugModel(models.Model):
         return self.name
 
 
-class ObjectBaseModel(models.Model):
+class ContentBaseModel(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     text = models.TextField('Текст')
     author = models.ForeignKey(

@@ -4,7 +4,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from reviews.abstracts import NameSlugModel, ObjectBaseModel
+from reviews.abstracts import NameSlugModel, ContentBaseModel
 from reviews.constants import LOOK_TEXT, MAX_LEN_TEXT, MAX_SCORE, MIN_SCORE
 
 
@@ -42,7 +42,7 @@ class Title(models.Model):
     )
 
     class Meta:
-        ordering = ('name', 'year')
+        ordering = ('-year')
         verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
         default_related_name = 'titles'
@@ -51,7 +51,7 @@ class Title(models.Model):
         return f'{self.name[:LOOK_TEXT]=}, {self.year=}, {self.description=}'
 
 
-class Review(ObjectBaseModel):
+class Review(ContentBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         verbose_name='Произведение')
@@ -60,7 +60,7 @@ class Review(ObjectBaseModel):
                               MaxValueValidator(MAX_SCORE)]
     )
 
-    class Meta(ObjectBaseModel.Meta):
+    class Meta(ContentBaseModel.Meta):
         verbose_name = 'отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = (
@@ -82,7 +82,7 @@ class Comment(ObjectBaseModel):
         verbose_name='Отзыв'
     )
 
-    class Meta(ObjectBaseModel.Meta):
+    class Meta(ContentBaseModel.Meta):
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
 

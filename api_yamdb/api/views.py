@@ -7,7 +7,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
     filters, mixins, permissions, serializers, status, viewsets
 )
-
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,7 +18,6 @@ from api.serializers import (
     CategorySerializer, GenreSerializer, TitleReadSerializer,
     TitleWriteSerializer, ReviewSerlizer, CommentSerlizer,
     SignupSerializer, UserRecieveTokenSerializer, UserSerializer
-
 )
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Title, Review
@@ -49,7 +47,7 @@ class GenreViewSet(OptionsViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
-        rating=models.Avg('reviews__score')).order_by(*Title._meta.ordering)
+        rating=models.Avg('reviews__score')).order_by('-rating', '-year')
     serializer_class = TitleReadSerializer
     http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (DjangoFilterBackend,)
