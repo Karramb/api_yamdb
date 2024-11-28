@@ -74,7 +74,7 @@ class Review(ContentBaseModel):
         return f'{self.title}, {self.score}'
 
 
-class Comment(ObjectBaseModel):
+class Comment(ContentBaseModel):
     text = models.TextField('Текст')
     review = models.ForeignKey(
         Review,
