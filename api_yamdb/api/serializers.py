@@ -85,8 +85,7 @@ class CommentSerlizer(serializers.ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = ('id', 'text', 'author', 'pub_date', 'review')
-        read_only_fields = ('review',)
+        fields = ('id', 'text', 'author', 'pub_date')
 
 
 class SignupSerializer(serializers.Serializer):
