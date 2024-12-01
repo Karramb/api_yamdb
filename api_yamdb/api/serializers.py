@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
 from reviews.models import Category, Genre, Title, Review, Comment
+
+from api.constants import CONFIRMATION_CODE_LENGTH
 from users.constants import (
-    CONFIRMATION_CODE_LENGTH,
     EMAIL_MAX_LENGTH,
     MAX_LENGTH_FOR_FIELDS
 )
 from users.models import YaMDBUser
-from users.validators import username_validate
+from users.validators import validate_username
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -89,16 +90,16 @@ class CommentSerlizer(serializers.ModelSerializer):
 class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=MAX_LENGTH_FOR_FIELDS,
-        validators=[username_validate],
+        validators=[validate_username],
         required=True
     )
     email = serializers.EmailField(max_length=EMAIL_MAX_LENGTH,
-                                   required=True)
+                                   required=True,)
 
 
 class UserRecieveTokenSerializer(serializers.Serializer):
     username = serializers.CharField(required=True,
-                                     validators=[username_validate],
+                                     validators=[validate_username],
                                      max_length=MAX_LENGTH_FOR_FIELDS)
     confirmation_code = serializers.CharField(
         max_length=CONFIRMATION_CODE_LENGTH,
@@ -107,8 +108,18 @@ class UserRecieveTokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True,
+                                     validators=[validate_username],
+                                     max_length=MAX_LENGTH_FOR_FIELDS)
+
     class Meta:
         model = YaMDBUser
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         )
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=YaMDBUser.objects.all(),
+                fields=['username']
+            )
+        ]

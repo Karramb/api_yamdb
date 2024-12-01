@@ -1,15 +1,16 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.db import models
+from django.db import IntegrityError, models
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
-    filters, mixins, permissions, serializers, status, viewsets
+    filters, generics, mixins, permissions, serializers, status, viewsets
 )
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api.filters import TitleFilter
@@ -19,9 +20,8 @@ from api.serializers import (
     TitleWriteSerializer, ReviewSerlizer, CommentSerlizer,
     SignupSerializer, UserRecieveTokenSerializer, UserSerializer
 )
-from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from api_yamdb.settings import DEFAULT_FROM_EMAIL, RESERVED_NAME
 from reviews.models import Category, Genre, Title, Review
-from users.constants import ME
 from users.models import YaMDBUser
 
 
@@ -99,28 +99,30 @@ class CommentViewSet(viewsets.ModelViewSet):
         return self.get_review().comments.all()
 
 
-class UserCreateViewSet(mixins.CreateModelMixin,
-                        viewsets.GenericViewSet):
+class UserSignUp(generics.CreateAPIView):
     queryset = YaMDBUser.objects.all()
     serializer_class = SignupSerializer()
     permission_classes = (permissions.AllowAny,)
 
-    def create(self, request):
-        query = Q(email=request.data.get('email'))
-        query.add(Q(username=request.data.get('username')), Q.OR)
-        user = YaMDBUser.objects.filter(query).first()
-        if user:
-            if (user.email == request.data.get('email')
-                    and user.username == request.data.get('username')):
-                pass
-            else:
-                raise serializers.ValidationError(
-                    'Пользователь с такими данными уже есть в системе')
+    def post(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user, _ = YaMDBUser.objects.get_or_create(
-            **serializer.validated_data
-        )
+        try:
+            user, _ = YaMDBUser.objects.get_or_create(
+                email=request.data.get('email'),
+                username=request.data.get('username'))
+        except IntegrityError as e:
+            errorInfo = e.args
+            if 'email' in str(errorInfo[0]):
+                raise serializers.ValidationError(
+                    f'Пользователь c почтой {request.data.get("email")}'
+                    f' уже существует.'
+                )
+            elif 'username' in str(errorInfo[0]):
+                raise serializers.ValidationError(
+                    f'Пользователь c логином {request.data.get("username")}'
+                    f' уже существует.'
+                )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             subject='Код подтверждения',
@@ -132,13 +134,12 @@ class UserCreateViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserReceiveTokenViewSet(mixins.CreateModelMixin,
-                              viewsets.GenericViewSet):
+class UserReceiveTokenV(APIView):
     queryset = YaMDBUser.objects.all()
     serializer_class = UserRecieveTokenSerializer
     permission_classes = (permissions.AllowAny,)
 
-    def create(self, request):
+    def post(self, request):
         serializer = UserRecieveTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = get_object_or_404(
@@ -164,14 +165,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False,
             methods=['get'],
-            url_path=ME,
+            url_path=RESERVED_NAME,
             permission_classes=(IsAuthenticated,))
     def self_data(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @self_data.mapping.patch
-    def patch_me(self, request):
+    def patch_self_data(self, request):
         user = request.user
         serializer = UserSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
