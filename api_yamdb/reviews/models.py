@@ -4,8 +4,8 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from reviews.abstracts import NameSlugModel, ObjectBaseModel
-from reviews.constants import LOOK_TEXT, MAX_LEN_TXT, MAX_SCORE, MIN_SCORE
+from reviews.abstracts import NameSlugModel, ContentBaseModel
+from reviews.constants import LOOK_TEXT, MAX_LEN_TEXT, MAX_SCORE, MIN_SCORE
 
 
 def validate_year(value):
@@ -32,7 +32,7 @@ class Genre(NameSlugModel):
 
 
 class Title(models.Model):
-    name = models.CharField('Название', max_length=MAX_LEN_TXT)
+    name = models.CharField('Название', max_length=MAX_LEN_TEXT)
     year = models.SmallIntegerField('Год', validators=[validate_year])
     description = models.TextField('Описание', blank=True, null=True)
     genre = models.ManyToManyField(Genre, verbose_name='Жанр')
@@ -42,16 +42,16 @@ class Title(models.Model):
     )
 
     class Meta:
-        ordering = ('name', 'year')
+        ordering = ('-year',)
         verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
         default_related_name = 'titles'
 
     def __str__(self):
-        return self.name
+        return f'{self.name[:LOOK_TEXT]=}, {self.year=}, {self.description=}'
 
 
-class Review(ObjectBaseModel):
+class Review(ContentBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         verbose_name='Произведение')
@@ -60,10 +60,9 @@ class Review(ObjectBaseModel):
                               MaxValueValidator(MAX_SCORE)]
     )
 
-    class Meta(ObjectBaseModel.Meta):
+    class Meta(ContentBaseModel.Meta):
         verbose_name = 'отзыв'
         verbose_name_plural = 'Отзывы'
-        default_related_name = 'reviews'
         constraints = (
             models.UniqueConstraint(
                 fields=['author', 'title'],
@@ -75,19 +74,17 @@ class Review(ObjectBaseModel):
         return f'{self.title}, {self.score}'
 
 
-class Comments(ObjectBaseModel):
-    text = models.TextField('Комментарий')
+class Comment(ContentBaseModel):
+    text = models.TextField('Текст')
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         verbose_name='Отзыв'
     )
 
-    class Meta(ObjectBaseModel.Meta):
+    class Meta(ContentBaseModel.Meta):
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
-        default_related_name = 'comments'
-        ordering = ('text',)
 
     def __str__(self):
         return self.text[:LOOK_TEXT]

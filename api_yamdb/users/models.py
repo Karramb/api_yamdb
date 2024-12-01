@@ -5,7 +5,7 @@ from users.constants import (
     EMAIL_MAX_LENGTH,
     MAX_LENGTH_FOR_FIELDS
 )
-from users.validators import username_validate
+from users.validators import validate_username
 
 
 class YaMDBUser(AbstractUser):
@@ -17,7 +17,7 @@ class YaMDBUser(AbstractUser):
     username = models.CharField(
         max_length=MAX_LENGTH_FOR_FIELDS,
         unique=True,
-        validators=[username_validate],
+        validators=[validate_username],
         verbose_name='Никнейм',
     )
     email = models.EmailField(

@@ -7,14 +7,14 @@ from django.http.response import Http404
 from django.core.management.base import BaseCommand
 from django.shortcuts import get_object_or_404
 
-from reviews.models import Category, Comments, Genre, Review, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import YaMDBUser
 from api_yamdb.settings import PATH_FOR_CSV
 
 
 MODELS_DICT = {
     'category': Category,
-    'comments': Comments,
+    'comments': Comment,
     'genre_title': Title.genre.through,
     'genre': Genre,
     'review': Review,

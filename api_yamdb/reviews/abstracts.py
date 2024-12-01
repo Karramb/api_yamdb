@@ -1,11 +1,11 @@
 from django.db import models
 
-from reviews.constants import MAX_LEN_SLUG, MAX_LEN_TXT
+from reviews.constants import MAX_LEN_SLUG, MAX_LEN_TEXT
 from users.models import YaMDBUser
 
 
 class NameSlugModel(models.Model):
-    name = models.CharField('Название', max_length=MAX_LEN_TXT)
+    name = models.CharField('Название', max_length=MAX_LEN_TEXT)
     slug = models.SlugField('Слаг', max_length=MAX_LEN_SLUG, unique=True)
 
     class Meta:
@@ -16,7 +16,7 @@ class NameSlugModel(models.Model):
         return self.name
 
 
-class ObjectBaseModel(models.Model):
+class ContentBaseModel(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     text = models.TextField('Текст')
     author = models.ForeignKey(
@@ -27,3 +27,4 @@ class ObjectBaseModel(models.Model):
     class Meta:
         abstract = True
         ordering = ('-pub_date',)
+        default_related_name = '%(class)ss'
