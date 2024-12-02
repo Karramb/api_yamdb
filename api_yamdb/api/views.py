@@ -108,20 +108,16 @@ class UserSignUp(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         try:
             user, _ = YaMDBUser.objects.get_or_create(
-                email=request.data.get('email'),
-                username=request.data.get('username'))
-        except IntegrityError as e:
-            errorInfo = e.args
-            if 'email' in str(errorInfo[0]):
-                raise serializers.ValidationError(
-                    f'Пользователь c почтой {request.data.get("email")}'
-                    f' уже существует.'
+                **serializer.validated_data
+            )
+        except IntegrityError:
+            raise serializers.ValidationError(
+                'Пользователь c {} уже существует.'.format(
+                    "Никнейм" if YaMDBUser.objects.filter(
+                        email=request.data.get('username')
+                    ).exists() else "email"
                 )
-            elif 'username' in str(errorInfo[0]):
-                raise serializers.ValidationError(
-                    f'Пользователь c логином {request.data.get("username")}'
-                    f' уже существует.'
-                )
+            )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             subject='Код подтверждения',
