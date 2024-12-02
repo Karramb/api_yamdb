@@ -10,9 +10,11 @@ def validate_username(username):
     if username == RESERVED_NAME:
         raise ValidationError(
             f'Нельзя использовать имя {RESERVED_NAME}')
-    invalid_chars = re.findall(EXAMPLE, username)
+    invalid_chars = re.sub(EXAMPLE, '', username)
     if invalid_chars:
         raise ValidationError(
-            f'Данные символы недопустимы: {invalid_chars}'
+            'Данные символы недопустимы: {}'.format(
+                ''.join(set(invalid_chars))
+            )
         )
     return username
