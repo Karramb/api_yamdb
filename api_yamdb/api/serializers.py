@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comment
-
 from api.constants import CONFIRMATION_CODE_LENGTH
+from reviews.models import Category, Genre, Title, Review, Comment
 from users.constants import (
     EMAIL_MAX_LENGTH,
     MAX_LENGTH_FOR_FIELDS
@@ -108,18 +107,13 @@ class UserRecieveTokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True,
-                                     validators=[validate_username],
-                                     max_length=MAX_LENGTH_FOR_FIELDS)
 
     class Meta:
         model = YaMDBUser
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         )
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=YaMDBUser.objects.all(),
-                fields=['username']
-            )
-        ]
+
+    def validate_username(self, username):
+        validate_username(username)
+        return username
