@@ -21,7 +21,7 @@ class ContentBaseModel(models.Model):
     text = models.TextField('Текст')
     author = models.ForeignKey(
         YaMDBUser, on_delete=models.CASCADE,
-        verbose_name='Автор', related_name='%(class)s_objectbase'
+        verbose_name='Автор'
     )
 
     class Meta:
